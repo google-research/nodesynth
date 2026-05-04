@@ -55,3 +55,10 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 ## Contributing
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for details.
+
+## How to run it on your own machine
+
+python3 -m venv venv;
+source venv/bin/activate;
+pip install -r requirements.txt;
+streamlit run streamlit_app.py;
