@@ -1,5 +1,7 @@
 # NodeSynth
 
+Tool Prototype: http://go/sarai-external-prototype
+
 NodeSynth is a research prototype that implements a scalable, multi-stage
 method for creating socially relevant and grounded synthetic data (e.g.,
 annotated queries) for AI model evaluation. The pipeline breaks down topics
