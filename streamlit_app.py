@@ -269,7 +269,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# Data Loading & Plotly Subplots (from sarai)
+# Data Loading & Plotly Subplots
 @st.cache_data
 def load_data(path: str) -> pd.DataFrame:
     df = pd.read_csv(path)
@@ -419,7 +419,7 @@ def create_sankey_visualization(df_final):
     main_filter_columns = {
         'user_group': {'x': 0.05, 'label_plural': 'User Groups'},
         'level1': {'x': 0.20, 'label_plural': 'Level 1s'},
-        'user_case': {'x': 0.35, 'label_plural': 'User Cases'},
+        'user_case': {'x': 0.35, 'label_plural': 'Use Cases'},
         'model_modality': {'x': 0.50, 'label_plural': 'Model Modalities'},
         'cleaned_Country': {'x': 0.65, 'label_plural': 'Countries'}
     }
@@ -490,7 +490,7 @@ def create_sankey_visualization(df_final):
 
 # Application State
 if 'step' not in st.session_state:
-    st.session_state.step = "Concept"
+    st.session_state.step = "Read Me"
 
 if 'highest_step' not in st.session_state:
     st.session_state.highest_step = 0
@@ -509,8 +509,8 @@ def set_step(new_step):
 with st.sidebar:
     st.markdown("### Navigation")
     
-    steps = ["Concept", "Taxonomy", "Data", "Evaluate", "Autorater", "Analyze"]
-    icons = ["💡", "🕸️", "🗄️", "✅", "📝", "📊"]
+    steps = ["Read Me", "Concept", "Taxonomy", "Data", "Evaluation", "Autorater", "Analysis"]
+    icons = ["📖", "💡", "🕸️", "🗄️", "✅", "📝", "📊"]
     
     for i, step in enumerate(steps):
         is_active = st.session_state.step == step
@@ -526,7 +526,60 @@ with st.sidebar:
 
 
 # Main Content Area
-if st.session_state.step == "Concept":
+if st.session_state.step == "Read Me":
+    st.title("📖 User Guide: NodeSynth")
+
+    st.markdown(
+        "Welcome to the NodeSynth prototype. NodeSynth is a systematic, social-science-informed, and evidence-grounded methodology for generating socially relevant synthetic queries for AI model evaluation. It enables a holistic assessment of model behavior across sensitive domains and complex policies."
+    )
+
+
+
+    # The Challenge
+    st.markdown(
+        """
+    <div style="background-color: #f9fafb; padding: 1.5rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; margin-bottom: 1rem;">
+        <h3 style="margin-top: 0; color: #1f2937; font-size: 1.25rem; font-weight: 600;">📄 The Challenge</h3>
+        <p style="color: #4b5563; line-height: 1.6; margin-bottom: 0;">Standard benchmarks and manual query creation struggle to capture real-world sociotechnical nuance or scale effectively. While generic synthetic data offers an alternative, these datasets often contain unintended biases, lack diversity, and are inaccurate for highly-sensitive domains.</p>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("### 🔄 End-to-End Workflow")
+    st.markdown(
+        """
+    1. **Concept Setup:** Define the overarching theme (e.g., "Cultural Bias") and operational constraints (countries, languages, modality).
+    2. **Taxonomy Generation:** The system leverages a fine-tuned taxonomy generator (TaG) to intelligently extrapolate a structured vocabulary (L1, L2, L3). This grounds abstract concepts in concrete, granular scenarios.
+    3. **Data Synthesis:** We generate synthetic examples, anchoring them in intersections of sensitive attributes and complex societal contexts.
+    4. **Evaluation:** You define a rubric targeting nuanced harms. We evaluate the model's performance on the synthetic dataset, specifically assessing safety, accuracy, and bias alignment.
+    5. **Analysis Dashboard:** Root cause analysis made visual. Trace where model performance degrades across taxonomic and demographic intersections to facilitate targeted interventions.
+    """
+    )
+
+    # Core Contributions
+    st.markdown(
+        """
+    <div style="background-color: #fdf2f8; padding: 1.5rem; border-radius: 0.5rem; border: 1px solid #fbcfe8; margin-bottom: 1rem;">
+        <h3 style="margin-top: 0; color: #1f2937; font-size: 1.25rem; font-weight: 600;">🎯 Core Contributions</h3>
+        <ul style="color: #4b5563; line-height: 1.6; padding-left: 1.5rem; margin-bottom: 0;">
+            <li><strong>Sociotechnical Framework:</strong> Leverages an expert-curated TaG (Taxonomy Generator) to ground synthetic data in real-world harms.</li>
+            <li><strong>Empowered Scaling:</strong> Specifically designed to enable resource-constrained entities (researchers, civil society) to scale high-stakes model evaluation.</li>
+            <li><strong>Empirical Efficacy:</strong> Demonstrates that granular taxonomic depth significantly outperforms standard datasets, eliciting higher failure rates across mainstream AI models.</li>
+            <li><strong>Interpretable Diagnostics:</strong> Allows evaluators to trace exact failure intersections for mitigation.</li>
+        </ul>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+
+
+    if st.button("Next: Concept Setup", type="primary"):
+        st.session_state.highest_step = max(st.session_state.highest_step, 1)
+        st.session_state.step = "Concept"
+        st.rerun()
+elif st.session_state.step == "Concept":
     st.markdown("""
 <div class="content-card" style="
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -553,6 +606,9 @@ if st.session_state.step == "Concept":
 <label style="font-weight: 700; font-size: 0.85rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Target Concept</label>
 </div>
 """, unsafe_allow_html=True)
+            
+            st.text_input("Target Concept", value="Medical Advice", key="target_concept_display", disabled=True, label_visibility="collapsed")
+
             # Concept Selection with Callback
             def update_concept_settings():
                 concept = st.session_state.target_concept
@@ -573,15 +629,9 @@ if st.session_state.step == "Concept":
             if 'use_case' not in st.session_state:
                 st.session_state.use_case = "Advice seeking"
             if 'modality' not in st.session_state:
-                st.session_state.modality = "text-to-text"
+                st.session_state.modality = ["text-to-text", "text-to-video"]
 
-            selected_concept = st.selectbox(
-                "Target Concept", 
-                ["Medical Advice", "Cultural Representation"], 
-                key="target_concept",
-                on_change=update_concept_settings,
-                label_visibility="collapsed"
-            )
+            st.session_state.target_concept = "Medical Advice"
             
             st.markdown("""<div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; margin-bottom: 0.5rem;">
 <span style="font-size: 1.1rem;">🌍</span>
@@ -608,7 +658,7 @@ if st.session_state.step == "Concept":
 <span style="font-size: 1.1rem;">🔄</span>
 <label style="font-weight: 700; font-size: 0.85rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Modality</label>
 </div>""", unsafe_allow_html=True)
-            st.selectbox("Modality", ["text-to-text", "text-to-image", "text-to-video"], key="modality", label_visibility="collapsed")
+            st.multiselect("Modality", ["text-to-text", "text-to-image", "text-to-video"], default=["text-to-text", "text-to-video"], key="modality", label_visibility="collapsed")
             
         st.write("")
         if st.button("Generate Taxonomy", type="primary"):
@@ -633,7 +683,7 @@ if st.session_state.step == "Concept":
                     st.error(f"Data file '{csv_file}' not found.")
                     st.stop()
                 
-                st.session_state.highest_step = max(st.session_state.highest_step, 1)
+                st.session_state.highest_step = max(st.session_state.highest_step, 2)
                 st.session_state.step = "Taxonomy"
                 st.rerun()
 
@@ -663,7 +713,7 @@ elif st.session_state.step == "Taxonomy":
 """, unsafe_allow_html=True)
     
     
-    tab_graph, tab_structure = st.tabs(["Knowledge Graph", "Taxonomy Structure"])
+    tab_graph, tab_structure = st.tabs(["Taxonomy Flow", "Taxonomy Structure"])
     
     with tab_graph:
         if not st.session_state.demo_data.empty:
@@ -825,7 +875,7 @@ elif st.session_state.step == "Taxonomy":
                          paper = str(node_data.get('paper_content', ''))
                          title_match = re.search(r'\*\*Title:\*\*\s*(?:\"(.*?)\"|(.*?)\n)', paper)
                          if title_match:
-                             title = (title_match.group(1) or title_match.group(2) or "Research Paper").strip()
+                              title = (title_match.group(1) or title_match.group(2) or "Citation 1").strip()
                              
                          url_val = node_data.get('url', '')
                          if isinstance(url_val, str) and url_val.startswith('['):
@@ -852,7 +902,7 @@ elif st.session_state.step == "Taxonomy":
     if st.button("Next: Generate Data", type="primary"):
         with st.spinner("Synthesizing Synthetic Data Data Points (Simulated)..."):
             time.sleep(1)
-            st.session_state.highest_step = max(st.session_state.highest_step, 2)
+            st.session_state.highest_step = max(st.session_state.highest_step, 3)
             st.session_state.step = "Data"
             st.rerun()
 
@@ -1086,7 +1136,7 @@ elif st.session_state.step == "Data":
         st.markdown("""
 <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #f1f5f9; background: rgba(248,250,252,0.3); display: flex; align-items: center; gap: 0.75rem;">
 <span style="color: #6366f1; font-size: 18px;">📋</span>
-<h4 style="margin: 0; font-size: 12px; font-weight: 900; color: #334155; text-transform: uppercase; letter-spacing: 0.1em;">Ground Truth Inspector</h4>
+<h4 style="margin: 0; font-size: 12px; font-weight: 900; color: #334155; text-transform: uppercase; letter-spacing: 0.1em;">Data Inspector</h4>
 </div>
 """, unsafe_allow_html=True)
         gt_df = df_work[['level2', 'level3', 'prompts', 'complexity', 'extracted_Country', 'Domain']].copy()
@@ -1123,9 +1173,9 @@ elif st.session_state.step == "Data":
         with col_btn:
             csv_data = display_df.to_csv(index=False).encode('utf-8')
             st.download_button(
-                label="📥 Download Ground Truth Data (CSV)",
+                label="📥 Download Annotated Synthetic Data",
                 data=csv_data,
-                file_name='ground_truth_inspector.csv',
+                file_name='annotated_synthetic_data.csv',
                 mime='text/csv',
                 use_container_width=True
             )
@@ -1145,11 +1195,11 @@ elif st.session_state.step == "Data":
         st.warning("No data loaded. Ensure 'NodeSynth_Data_med_Full_Export.csv' is present.")
 
     if st.button("Next: Setup Evaluation", type="primary"):
-        st.session_state.highest_step = max(st.session_state.highest_step, 3)
-        st.session_state.step = "Evaluate"
+        st.session_state.highest_step = max(st.session_state.highest_step, 4)
+        st.session_state.step = "Evaluation"
         st.rerun()
 
-elif st.session_state.step == "Evaluate":
+elif st.session_state.step == "Evaluation":
     if 'eval_generated' not in st.session_state:
         st.session_state.eval_generated = False
 
@@ -1162,7 +1212,7 @@ elif st.session_state.step == "Evaluate":
     box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.3);
 ">
 <h2 style="margin-top:0; color: white; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 0.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Evaluate Your Target Model</h2>
-<p style="color: #cbd5e1; font-size: 1.1rem; max-width: 600px; margin-bottom: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Generate responses from the model you want to evaluate</p>
+<p style="color: #cbd5e1; font-size: 1.1rem; max-width: 600px; margin-bottom: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Generate responses from the model you want to evaluate.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1212,7 +1262,7 @@ elif st.session_state.step == "Evaluate":
 
         # Auto-filter
         filtered_df = eval_df.copy()
-        filtered_df = filtered_df[filtered_df['dataset_source'] == 'sarai']
+        filtered_df = filtered_df[filtered_df['dataset_source'] == 'nodesynth']
         if selected_model != 'All':
             filtered_df = filtered_df[filtered_df['target_model'] == selected_model]
 
@@ -1278,7 +1328,7 @@ elif st.session_state.step == "Evaluate":
         st.warning("Could not load evaluation_data.csv")
 
     if st.button("Next: Define Autorator", type="primary"):
-        st.session_state.highest_step = max(st.session_state.highest_step, 4)
+        st.session_state.highest_step = max(st.session_state.highest_step, 5)
         st.session_state.step = "Autorater"
         st.rerun()
 
@@ -1410,11 +1460,12 @@ Classification:"""
             st.info("Click 'Rate' on the left to load the feedback data.")
 
     if st.button("Next: Analyze ratings", type="primary"):
-        st.session_state.highest_step = max(st.session_state.highest_step, 5)
-        st.session_state.step = "Analyze"
+        st.session_state.highest_step = max(st.session_state.highest_step, 6)
+        st.session_state.step = "Analysis"
         st.rerun()
 
-elif st.session_state.step == "Analyze":
+elif st.session_state.step == "Analysis":
+    # ── Hero Banner ──────────────────────────────────────────────────────────
     st.markdown("""
 <div class="content-card" style="
     background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
@@ -1425,12 +1476,13 @@ elif st.session_state.step == "Analyze":
 <div style="background: rgba(255,255,255,0.2); border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
 <span style="font-size: 1.5rem;">📊</span>
 </div>
-<h2 style="margin: 0; color: white; font-size: 2rem; font-weight: 800; letter-spacing: -0.025em; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Error Analysis Dashboard</h2>
+<h2 style="margin: 0; color: white; font-size: 2rem; font-weight: 800; letter-spacing: -0.025em; text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-family: 'Inter', sans-serif;">Error Analysis Dashboard</h2>
 </div>
-<p style="color: rgba(255,255,255,0.85); font-size: 1.05rem; max-width: 600px; margin: 0;">Disclosure compliance analysis across models and data sources. Identify failure patterns and missing medical disclaimers.</p>
+<p style="color: rgba(255,255,255,0.85); font-size: 1.05rem; max-width: 600px; margin: 0; font-family: 'Inter', sans-serif;">Disclosure compliance analysis across models and data sources. Identify failure patterns and missing medical disclaimers.</p>
 </div>
 """, unsafe_allow_html=True)
 
+    # ── Data Loading ─────────────────────────────────────────────────────────
     @st.cache_data
     def load_analyse_data():
         try:
@@ -1440,1229 +1492,901 @@ elif st.session_state.step == "Analyze":
 
     df_med_plot_cleaned = load_analyse_data()
 
-    # Heading 1
-    st.subheader("Disclosure Rate by Taxonomy")
-    t1, t2 = st.tabs(["Rating and Level 1", "Rating x Level 2"])
+    # ── Shared Styling Constants ─────────────────────────────────────────────
+    FONT_STYLE = dict(family="'Inter', sans-serif", size=14, color="#334155")
+    BRAND_COLORSCALE = [
+        [0.0, "#eef2ff"],
+        [0.15, "#c7d2fe"],
+        [0.3, "#a5b4fc"],
+        [0.45, "#818cf8"],
+        [0.6, "#6366f1"],
+        [0.75, "#a855f7"],
+        [0.85, "#d946ef"],
+        [0.95, "#ec4899"],
+        [1.0, "#f43f5e"],
+    ]
+    MODEL_COLORS = {
+        "Claude 4.5 Haiku": {"line": "#8b5cf6", "fill": "rgba(139,92,246,0.08)"},
+        "Gemini 2.5 flash": {"line": "#6366f1", "fill": "rgba(99,102,241,0.08)"},
+        "Llama 4 Scout": {"line": "#ec4899", "fill": "rgba(236,72,153,0.08)"},
+        "GPT o4-mini": {"line": "#f59e0b", "fill": "rgba(245,158,11,0.08)"},
+    }
+
 
     def u_shaped_sort_by_length(items_list):
-        # Convert to string and remove empty
         items = [str(x) for x in items_list if str(x).strip() != ""]
-        # Remove duplicates
         items = list(set(items))
-        # Sort by length descending
         sorted_by_len = sorted(items, key=lambda x: len(x), reverse=True)
-
         start_half = []
         end_half = []
-
         for i, val in enumerate(sorted_by_len):
             if i % 2 == 0:
                 start_half.append(val)
             else:
                 end_half.insert(0, val)
-
         return start_half + end_half
 
-    with t1:
-        if not df_med_plot_cleaned.empty:
-            import plotly.graph_objects as go
+    def make_brand_heatmap(z, x, y, show_colorbar=True):
+        """Create a consistently styled heatmap trace with adaptive text colors."""
+        # Build text color array: dark text on light cells, white on dark cells
+        text_colors = []
+        for row in z:
+            row_colors = []
+            for val in row:
+                if val < 40:
+                    row_colors.append("#334155")
+                elif val < 60:
+                    row_colors.append("#1e293b")
+                else:
+                    row_colors.append("white")
+            text_colors.append(row_colors)
 
+        return go.Heatmap(
+            z=z, x=x, y=y,
+            colorscale=BRAND_COLORSCALE,
+            zmin=0, zmax=100,
+            text=z,
+            texttemplate="%{text:.1f}%",
+            textfont=dict(size=13, family="'Inter', sans-serif"),
+            showscale=show_colorbar,
+            colorbar=dict(
+                title=dict(text="Rate (%)<br>", font=dict(family="'Inter', sans-serif", size=13, color="#334155"), side="top"),
+                thickness=14, len=0.75,
+                ticksuffix="%",
+                outlinewidth=0,
+                tickfont=dict(family="'Inter', sans-serif", size=11, color="#64748b"),
+            ) if show_colorbar else None,
+            hovertemplate="<b>%{y}</b> × %{x}<br>Rate: %{z:.1f}%<extra></extra>",
+        )
+
+
+    def style_heatmap_layout(fig, title_text, chart_height, left_margin=350):
+        """Apply consistent layout styling to heatmap figures."""
+        fig.update_layout(
+            title=dict(
+                text=title_text, y=0.98, x=0.5, xanchor="center", yanchor="top",
+                font=dict(size=17, family="'Inter', sans-serif", color="#0f172a", weight=700),
+            ),
+            template="simple_white",
+            height=chart_height,
+            font=FONT_STYLE,
+            margin=dict(l=left_margin, r=100, t=60, b=100),
+            paper_bgcolor="white",
+            plot_bgcolor="white",
+        )
+        fig.update_xaxes(
+            side="bottom", tickfont=dict(size=13, color="#475569", family="'Inter', sans-serif"),
+            tickangle=0, title_font=dict(size=13, color="#64748b", family="'Inter', sans-serif"),
+            title_standoff=15, gridcolor="#f1f5f9", showline=True, linecolor="#e2e8f0",
+        )
+        fig.update_yaxes(
+            tickfont=dict(size=13, color="#475569", family="'Inter', sans-serif"),
+            title_font=dict(size=13, color="#64748b", family="'Inter', sans-serif"),
+            autorange="reversed", gridcolor="#f1f5f9", showline=True, linecolor="#e2e8f0",
+        )
+
+    # ── KPI Summary Cards ────────────────────────────────────────────────────
+    if not df_med_plot_cleaned.empty:
+        total_queries = len(df_med_plot_cleaned)
+        disclosure_count = len(df_med_plot_cleaned[df_med_plot_cleaned["Binary Safety Status"] == "Disclosure"])
+        overall_disclosure_rate = (disclosure_count / total_queries * 100) if total_queries > 0 else 0
+
+        # Most vulnerable L1 category (highest No Disclosure rate)
+        l1_status = df_med_plot_cleaned.groupby(["level1", "Binary Safety Status"]).size().reset_index(name="Count")
+        l1_totals = df_med_plot_cleaned.groupby("level1").size().reset_index(name="Total")
+        l1_no_disc = l1_status[l1_status["Binary Safety Status"] == "No Disclosure"].merge(l1_totals, on="level1")
+        l1_no_disc["Rate"] = l1_no_disc["Count"] / l1_no_disc["Total"] * 100
+        most_vulnerable_l1 = l1_no_disc.loc[l1_no_disc["Rate"].idxmax(), "level1"] if not l1_no_disc.empty else "N/A"
+        most_vulnerable_rate = l1_no_disc["Rate"].max() if not l1_no_disc.empty else 0
+
+        # Best performing model (highest disclosure rate)
+        model_disc = df_med_plot_cleaned.groupby(["Model", "Binary Safety Status"]).size().reset_index(name="Count")
+        model_totals = df_med_plot_cleaned.groupby("Model").size().reset_index(name="Total")
+        model_disc_only = model_disc[model_disc["Binary Safety Status"] == "Disclosure"].merge(model_totals, on="Model")
+        model_disc_only["Rate"] = model_disc_only["Count"] / model_disc_only["Total"] * 100
+        best_model = model_disc_only.loc[model_disc_only["Rate"].idxmax(), "Model"] if not model_disc_only.empty else "N/A"
+        best_model_rate = model_disc_only["Rate"].max() if not model_disc_only.empty else 0
+
+        st.markdown(f"""
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+  <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: transform 0.2s; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #6366f1, #818cf8);"></div>
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+      <div style="width: 36px; height: 36px; background: #eef2ff; border-radius: 10px; display: flex; align-items: center; justify-content: center;"><span style="font-size: 1.1rem;">📋</span></div>
+      <span style="font-size: 0.78rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Inter', sans-serif;">Total Queries</span>
+    </div>
+    <div style="font-size: 2rem; font-weight: 800; color: #0f172a; letter-spacing: -0.025em; font-family: 'Inter', sans-serif;">{total_queries:,}</div>
+    <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.25rem; font-family: 'Inter', sans-serif;">across {len(df_med_plot_cleaned['Model'].unique())} models</div>
+  </div>
+  <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: transform 0.2s; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #22c55e, #4ade80);"></div>
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+      <div style="width: 36px; height: 36px; background: #f0fdf4; border-radius: 10px; display: flex; align-items: center; justify-content: center;"><span style="font-size: 1.1rem;">✅</span></div>
+      <span style="font-size: 0.78rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Inter', sans-serif;">Disclosure Rate</span>
+    </div>
+    <div style="font-size: 2rem; font-weight: 800; color: #0f172a; letter-spacing: -0.025em; font-family: 'Inter', sans-serif;">{overall_disclosure_rate:.1f}%</div>
+    <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.25rem; font-family: 'Inter', sans-serif;">{disclosure_count:,} compliant responses</div>
+  </div>
+  <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: transform 0.2s; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #ef4444, #f87171);"></div>
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+      <div style="width: 36px; height: 36px; background: #fef2f2; border-radius: 10px; display: flex; align-items: center; justify-content: center;"><span style="font-size: 1.1rem;">⚠️</span></div>
+      <span style="font-size: 0.78rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Inter', sans-serif;">Most Vulnerable</span>
+    </div>
+    <div style="font-size: 1.15rem; font-weight: 800; color: #0f172a; letter-spacing: -0.015em; font-family: 'Inter', sans-serif; line-height: 1.3;">{most_vulnerable_l1}</div>
+    <div style="font-size: 0.8rem; color: #ef4444; margin-top: 0.25rem; font-weight: 600; font-family: 'Inter', sans-serif;">{most_vulnerable_rate:.1f}% failure rate</div>
+  </div>
+  <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: transform 0.2s; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #a855f7, #c084fc);"></div>
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+      <div style="width: 36px; height: 36px; background: #faf5ff; border-radius: 10px; display: flex; align-items: center; justify-content: center;"><span style="font-size: 1.1rem;">🏆</span></div>
+      <span style="font-size: 0.78rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Inter', sans-serif;">Best Model</span>
+    </div>
+    <div style="font-size: 1.15rem; font-weight: 800; color: #0f172a; letter-spacing: -0.015em; font-family: 'Inter', sans-serif;">{best_model}</div>
+    <div style="font-size: 0.8rem; color: #22c55e; margin-top: 0.25rem; font-weight: 600; font-family: 'Inter', sans-serif;">{best_model_rate:.1f}% disclosure rate</div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # SECTION 1: Model Performance Overview
+    # ══════════════════════════════════════════════════════════════════════════
+    st.markdown("""
+<div style="display: flex; align-items: center; gap: 0.75rem; margin: 2.5rem 0 1.25rem 0;">
+  <div style="width: 6px; height: 32px; background: linear-gradient(180deg, #6366f1, #a855f7); border-radius: 3px;"></div>
+  <h3 style="margin: 0; font-size: 1.35rem; font-weight: 800; color: #0f172a; letter-spacing: -0.02em; font-family: 'Inter', sans-serif;">Model Performance Overview</h3>
+  <span style="font-size: 0.8rem; color: #94a3b8; font-family: 'Inter', sans-serif; margin-left: 0.5rem;">High-level comparison across all evaluated models</span>
+</div>
+""", unsafe_allow_html=True)
+
+    tab_compare, tab_radar, tab_l1, tab_l2, tab_sunburst, tab_ngram = st.tabs([
+        "📊 Model Comparison", "🕸️ Radar Analysis", "🗂️ L1 Heatmap", "🗂️ L2 Heatmap", "🌀 Hierarchical View", "💬 Text Analysis"
+    ])
+
+    # ── Tab: Model Comparison (NEW) ──────────────────────────────────────────
+    with tab_compare:
+        if not df_med_plot_cleaned.empty:
+            model_status_counts = df_med_plot_cleaned.groupby(["Model", "Binary Safety Status"]).size().reset_index(name="Count")
+            model_totals_cmp = df_med_plot_cleaned.groupby("Model").size().reset_index(name="Total")
+            model_status_counts = model_status_counts.merge(model_totals_cmp, on="Model")
+            model_status_counts["Percentage"] = model_status_counts["Count"] / model_status_counts["Total"] * 100
+
+            models_ordered = model_status_counts.groupby("Model").apply(
+                lambda g: g[g["Binary Safety Status"] == "Disclosure"]["Percentage"].values[0] if len(g[g["Binary Safety Status"] == "Disclosure"]) > 0 else 0
+            ).sort_values(ascending=False).index.tolist()
+
+            fig_compare = go.Figure()
+
+            disc_data = model_status_counts[model_status_counts["Binary Safety Status"] == "Disclosure"]
+            no_disc_data = model_status_counts[model_status_counts["Binary Safety Status"] == "No Disclosure"]
+
+            disc_vals = [disc_data[disc_data["Model"] == m]["Percentage"].values[0] if len(disc_data[disc_data["Model"] == m]) > 0 else 0 for m in models_ordered]
+            no_disc_vals = [no_disc_data[no_disc_data["Model"] == m]["Percentage"].values[0] if len(no_disc_data[no_disc_data["Model"] == m]) > 0 else 0 for m in models_ordered]
+
+            fig_compare.add_trace(go.Bar(
+                name="Disclosure", x=models_ordered, y=disc_vals,
+                marker=dict(color="#6366f1", cornerradius=6),
+                text=[f"{v:.1f}%" for v in disc_vals], textposition="outside",
+                textfont=dict(size=13, family="'Inter', sans-serif", color="#4f46e5", weight=700),
+                hovertemplate="<b>%{x}</b><br>Disclosure: %{y:.1f}%<extra></extra>",
+            ))
+            fig_compare.add_trace(go.Bar(
+                name="No Disclosure", x=models_ordered, y=no_disc_vals,
+                marker=dict(color="#fbbf24", cornerradius=6),
+                text=[f"{v:.1f}%" for v in no_disc_vals], textposition="outside",
+                textfont=dict(size=13, family="'Inter', sans-serif", color="#d97706", weight=700),
+                hovertemplate="<b>%{x}</b><br>No Disclosure: %{y:.1f}%<extra></extra>",
+            ))
+
+            fig_compare.update_layout(
+                barmode="group",
+                title=dict(text="Disclosure vs. Non-Disclosure Rate by Model", font=dict(size=17, family="'Inter', sans-serif", color="#0f172a")),
+                font=FONT_STYLE,
+                template="simple_white",
+                height=500,
+                margin=dict(l=60, r=40, t=80, b=60),
+                paper_bgcolor="white",
+                plot_bgcolor="white",
+                legend=dict(
+                    orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1,
+                    font=dict(size=13, family="'Inter', sans-serif"),
+                    bgcolor="rgba(255,255,255,0.8)",
+                ),
+                yaxis=dict(title="Percentage (%)", ticksuffix="%", gridcolor="#f1f5f9"),
+                xaxis=dict(tickfont=dict(size=14, family="'Inter', sans-serif", color="#334155")),
+            )
+            st.plotly_chart(fig_compare, use_container_width=True)
+        else:
+            st.warning("analyse.csv data not found.")
+
+    # ── Tab: Radar Analysis (NEW) ────────────────────────────────────────────
+    with tab_radar:
+        if not df_med_plot_cleaned.empty:
+            # Calculate disclosure rate per model per L1
+            radar_data = df_med_plot_cleaned.groupby(["Model", "level1", "Binary Safety Status"]).size().reset_index(name="Count")
+            radar_totals = df_med_plot_cleaned.groupby(["Model", "level1"]).size().reset_index(name="Total")
+            radar_disc = radar_data[radar_data["Binary Safety Status"] == "No Disclosure"].merge(radar_totals, on=["Model", "level1"])
+            radar_disc["Failure Rate"] = radar_disc["Count"] / radar_disc["Total"] * 100
+
+            categories = sorted(df_med_plot_cleaned["level1"].unique())
+            fig_radar = go.Figure()
+
+            for model_name in df_med_plot_cleaned["Model"].unique():
+                model_radar = radar_disc[radar_disc["Model"] == model_name]
+                values = []
+                for cat in categories:
+                    cat_data = model_radar[model_radar["level1"] == cat]
+                    values.append(cat_data["Failure Rate"].values[0] if len(cat_data) > 0 else 0)
+                values.append(values[0])  # close the polygon
+
+                model_colors = MODEL_COLORS.get(model_name, {"line": "#6366f1", "fill": "rgba(99,102,241,0.08)"})
+                fig_radar.add_trace(go.Scatterpolar(
+                    r=values,
+                    theta=categories + [categories[0]],
+                    name=model_name,
+                    line=dict(width=2.5, color=model_colors["line"]),
+                    fill="toself",
+                    fillcolor=model_colors["fill"],
+
+                    opacity=0.85,
+                    hovertemplate="<b>%{theta}</b><br>Failure Rate: %{r:.1f}%<extra>" + model_name + "</extra>",
+                ))
+
+            fig_radar.update_layout(
+                polar=dict(
+                    radialaxis=dict(
+                        visible=True, range=[0, 100], ticksuffix="%",
+                        tickfont=dict(size=11, family="'Inter', sans-serif", color="#94a3b8"),
+                        gridcolor="#e2e8f0",
+                    ),
+                    angularaxis=dict(
+                        tickfont=dict(size=12, family="'Inter', sans-serif", color="#475569"),
+                        gridcolor="#e2e8f0",
+                    ),
+                    bgcolor="white",
+                ),
+                title=dict(text="Non-Disclosure (Failure) Rate by L1 Category per Model", font=dict(size=17, family="'Inter', sans-serif", color="#0f172a")),
+                font=FONT_STYLE,
+                height=600,
+                margin=dict(l=80, r=80, t=100, b=60),
+                paper_bgcolor="white",
+                legend=dict(
+                    font=dict(size=13, family="'Inter', sans-serif"),
+                    bgcolor="rgba(255,255,255,0.9)",
+                    bordercolor="#e2e8f0", borderwidth=1,
+                ),
+                showlegend=True,
+            )
+            st.plotly_chart(fig_radar, use_container_width=True)
+        else:
+            st.warning("analyse.csv data not found.")
+
+    # ── Tab: L1 Heatmap (polished) ───────────────────────────────────────────
+    with tab_l1:
+        if not df_med_plot_cleaned.empty:
             df_grouped_l1_model = (
-                df_med_plot_cleaned.groupby(
-                    ["Model", "level1", "Binary Safety Status"]
-                )
-                .size()
-                .reset_index(name="Count")
+                df_med_plot_cleaned.groupby(["Model", "level1", "Binary Safety Status"])
+                .size().reset_index(name="Count")
             )
             df_no_disclosure_l1 = df_grouped_l1_model[
                 df_grouped_l1_model["Binary Safety Status"] == "No Disclosure"
             ].copy()
-
             df_no_disclosure_l1["Total_No_Disclosure_Per_Model"] = (
                 df_no_disclosure_l1.groupby("Model")["Count"].transform("sum")
             )
             df_no_disclosure_l1["Percentage_of_No_Disclosure_by_L1"] = (
-                df_no_disclosure_l1["Count"]
-                / df_no_disclosure_l1["Total_No_Disclosure_Per_Model"]
+                df_no_disclosure_l1["Count"] / df_no_disclosure_l1["Total_No_Disclosure_Per_Model"]
             ) * 100
 
             df_heatmap_l1 = df_no_disclosure_l1.pivot_table(
-                index="level1",
-                columns="Model",
-                values="Percentage_of_No_Disclosure_by_L1",
-                aggfunc="first",
+                index="level1", columns="Model",
+                values="Percentage_of_No_Disclosure_by_L1", aggfunc="first",
             ).fillna(0)
+            df_heatmap_l1 = df_heatmap_l1.reindex(u_shaped_sort_by_length(df_heatmap_l1.index))
 
-            u_sorted_idx = u_shaped_sort_by_length(df_heatmap_l1.index)
-            df_heatmap_l1 = df_heatmap_l1.reindex(u_sorted_idx)
-
-            FONT_STYLE = dict(
-                family="Times New Roman, serif", size=14, color="black"
-            )
-
-            fig_l1 = go.Figure(
-                data=go.Heatmap(
-                    z=df_heatmap_l1.values,
-                    x=df_heatmap_l1.columns,
-                    y=df_heatmap_l1.index,
-                    colorscale="Blues",
-                    zmin=0,
-                    zmax=100,
-                    text=df_heatmap_l1.values,
-                    texttemplate="%{text:.1f}%",
-                    textfont={"size": 14, "color": "black"},
-                    colorbar=dict(
-                        title="Safety Rate (%)",
-                        thickness=15,
-                        len=0.8,
-                        ticksuffix="%",
-                        outlinewidth=1,
-                        outlinecolor="black",
-                    ),
-                )
-            )
-
-            chart_height = max(600, len(df_heatmap_l1.index) * 40 + 200)
-            fig_l1.update_layout(
-                title={
-                    "text": "<b>Figure 1:</b> Binary Safety Rate by Model and Level 1 Category",
-                    "y": 0.98,
-                    "x": 0.5,
-                    "xanchor": "center",
-                    "yanchor": "top",
-                    "font": dict(size=18),
-                },
-                template="simple_white",
-                width=max(900, len(df_heatmap_l1.columns) * 180 + 400),
-                height=chart_height,
-                font=FONT_STYLE,
-                margin=dict(l=250, r=100, t=50, b=120),
-            )
-
-            fig_l1.update_xaxes(
-                side="bottom",
-                tickfont=dict(size=14, color="black"),
-                tickangle=0,
-                title_text="AI Model",
-                title_font=dict(size=14, color="black"),
-                title_standoff=20,
-            )
-
-            fig_l1.update_yaxes(
-                tickfont=dict(size=14, color="black"),
-                title_text="Level 1 Safety Category",
-                title_font=dict(size=14, color="black"),
-                autorange="reversed",
-            )
+            fig_l1 = go.Figure(data=make_brand_heatmap(
+                df_heatmap_l1.values, df_heatmap_l1.columns.tolist(), df_heatmap_l1.index.tolist()
+            ))
+            chart_height = max(600, len(df_heatmap_l1.index) * 45 + 200)
+            style_heatmap_layout(fig_l1, "Non-Disclosure Rate by Model × Level 1 Category", chart_height)
+            fig_l1.update_xaxes(title_text="AI Model")
+            fig_l1.update_yaxes(title_text="Level 1 Safety Category")
 
             html_l1 = fig_l1.to_html(full_html=True, include_plotlyjs='cdn')
             components.html(html_l1, height=chart_height + 50, scrolling=True)
         else:
             st.warning("analyse.csv data not found.")
 
-    with t2:
+    # ── Tab: L2 Heatmap (polished) ───────────────────────────────────────────
+    with tab_l2:
         if not df_med_plot_cleaned.empty:
-            import plotly.graph_objects as go
-
             df_grouped_l2_model = (
-                df_med_plot_cleaned.groupby(
-                    ["Model", "level2", "Binary Safety Status"]
-                )
-                .size()
-                .reset_index(name="Count")
+                df_med_plot_cleaned.groupby(["Model", "level2", "Binary Safety Status"])
+                .size().reset_index(name="Count")
             )
             df_no_disclosure_l2 = df_grouped_l2_model[
                 df_grouped_l2_model["Binary Safety Status"] == "No Disclosure"
             ].copy()
-
             df_no_disclosure_l2["Total_No_Disclosure_Per_Model"] = (
                 df_no_disclosure_l2.groupby("Model")["Count"].transform("sum")
             )
             df_no_disclosure_l2["Percentage_of_No_Disclosure_by_L2"] = (
-                df_no_disclosure_l2["Count"]
-                / df_no_disclosure_l2["Total_No_Disclosure_Per_Model"]
+                df_no_disclosure_l2["Count"] / df_no_disclosure_l2["Total_No_Disclosure_Per_Model"]
             ) * 100
 
             df_heatmap = df_no_disclosure_l2.pivot_table(
-                index="level2",
-                columns="Model",
-                values="Percentage_of_No_Disclosure_by_L2",
-                aggfunc="first",
+                index="level2", columns="Model",
+                values="Percentage_of_No_Disclosure_by_L2", aggfunc="first",
             ).fillna(0)
+            df_heatmap = df_heatmap.reindex(u_shaped_sort_by_length(df_heatmap.index))
 
-            u_sorted_idx = u_shaped_sort_by_length(df_heatmap.index)
-            df_heatmap = df_heatmap.reindex(u_sorted_idx)
+            fig_l2 = go.Figure(data=make_brand_heatmap(
+                df_heatmap.values, df_heatmap.columns.tolist(), df_heatmap.index.tolist()
+            ))
+            chart_height = max(600, len(df_heatmap.index) * 45 + 200)
+            style_heatmap_layout(fig_l2, "Non-Disclosure Rate by Model × Level 2 Category", chart_height)
+            fig_l2.update_xaxes(title_text="AI Model")
+            fig_l2.update_yaxes(title_text="Level 2 Safety Category")
 
-            FONT_STYLE = dict(
-                family="Times New Roman, serif", size=14, color="black"
-            )
-
-            fig = go.Figure(
-                data=go.Heatmap(
-                    z=df_heatmap.values,
-                    x=df_heatmap.columns,
-                    y=df_heatmap.index,
-                    colorscale="Blues",
-                    zmin=0,
-                    zmax=100,
-                    text=df_heatmap.values,
-                    texttemplate="%{text:.1f}%",
-                    textfont={"size": 14, "color": "black"},
-                    colorbar=dict(
-                        title="Safety Rate (%)",
-                        thickness=15,
-                        len=0.8,
-                        ticksuffix="%",
-                        outlinewidth=1,
-                        outlinecolor="black",
-                    ),
-                )
-            )
-
-            chart_height = max(600, len(df_heatmap.index) * 40 + 200)
-            fig.update_layout(
-                title={
-                    "text": "<b>Figure 3:</b> Binary Safety Rate by Model and Level 2 Category",
-                    "y": 0.98,
-                    "x": 0.5,
-                    "xanchor": "center",
-                    "yanchor": "top",
-                    "font": dict(size=18),
-                },
-                template="simple_white",
-                width=max(900, len(df_heatmap.columns) * 180 + 400),
-                height=chart_height,
-                font=FONT_STYLE,
-                margin=dict(l=250, r=100, t=50, b=120),
-            )
-
-            fig.update_xaxes(
-                side="bottom",
-                tickfont=dict(size=14, color="black"),
-                tickangle=0,
-                title_text="AI Model",
-                title_font=dict(size=14, color="black"),
-                title_standoff=20,
-            )
-
-            fig.update_yaxes(
-                tickfont=dict(size=14, color="black"),
-                title_text="Level 2 Safety Category",
-                title_font=dict(size=14, color="black"),
-                autorange="reversed",
-            )
-
-            html_l2 = fig.to_html(full_html=True, include_plotlyjs='cdn')
+            html_l2 = fig_l2.to_html(full_html=True, include_plotlyjs='cdn')
             components.html(html_l2, height=chart_height + 50, scrolling=True)
         else:
             st.warning("analyse.csv data not found.")
 
-    # Heading 2
-    st.subheader("Disclosure Rate by Extracted Data")
-    t3, t4, t5 = st.tabs(
-        ["Rating x User group", "Rating x Demographics", "Rating x Occupation"]
-    )
+    # ── Tab: Sunburst (polished) ─────────────────────────────────────────────
+    with tab_sunburst:
+        if not df_med_plot_cleaned.empty:
+            fig_sunburst = px.sunburst(
+                df_med_plot_cleaned,
+                path=["Model", "level1", "Binary Safety Status"],
+                title="Safety Status Distribution by Model and Category",
+                color="Binary Safety Status",
+                color_discrete_map={
+                    "No Disclosure": "#f43f5e",
+                    "Disclosure": "#6366f1",
+                },
+            )
+            fig_sunburst.update_layout(
+                font=FONT_STYLE,
+                title=dict(font=dict(size=17, family="'Inter', sans-serif", color="#0f172a")),
+                paper_bgcolor="white",
+                height=650,
+                margin=dict(t=60, b=20, l=20, r=20),
+            )
+            fig_sunburst.update_traces(
+                textfont=dict(family="'Inter', sans-serif", size=12),
+                insidetextorientation="radial",
+            )
+            st.plotly_chart(fig_sunburst, use_container_width=True)
+        else:
+            st.warning("analyse.csv data not found.")
 
+    # ── Tab: Text Analysis — Per-Model Bi-gram Comparison ──────────────────────
+    with tab_ngram:
+        if not df_med_plot_cleaned.empty:
+            import re
+            from collections import Counter
+
+            stop_words = {"the", "a", "an", "is", "are", "was", "were", "be", "been", "being",
+                          "have", "has", "had", "do", "does", "did", "will", "would", "could",
+                          "should", "may", "might", "shall", "can", "to", "of", "in", "for",
+                          "on", "with", "at", "by", "from", "as", "into", "through", "during",
+                          "before", "after", "and", "but", "or", "nor", "not", "so", "yet",
+                          "i", "me", "my", "we", "our", "you", "your", "it", "its", "he",
+                          "she", "they", "them", "this", "that", "these", "those", "im", "dont",
+                          "ive", "how", "what", "about", "just", "want", "know", "like"}
+
+            def get_model_ngrams(df, model, text_column="prompts", n=2, top_k=10):
+                df_fail = df[(df["Model"] == model) & (df["Binary Safety Status"] == "No Disclosure")]
+                words = []
+                for text in df_fail[text_column].dropna():
+                    clean = re.sub(r"[^\w\s]", "", str(text).lower())
+                    tokens = [t for t in clean.split() if t not in stop_words and len(t) > 2]
+                    words.extend(tokens)
+                ngrams = [" ".join(words[i:i + n]) for i in range(len(words) - n + 1)]
+                return Counter(ngrams).most_common(top_k)
+
+            models = sorted(df_med_plot_cleaned["Model"].unique())
+            model_ngram_data = {}
+            for m in models:
+                top = get_model_ngrams(df_med_plot_cleaned, m, top_k=10)
+                model_ngram_data[m] = dict(top)
+
+            # ── Part 1: Faceted bar chart — top bi-grams per model (2×2 grid) ──
+            from plotly.subplots import make_subplots
+            import math
+            n_models = len(models)
+            n_cols = 2
+            n_rows = math.ceil(n_models / n_cols)
+            fig_facet = make_subplots(
+                rows=n_rows, cols=n_cols,
+                subplot_titles=models,
+                shared_yaxes=False,
+                horizontal_spacing=0.12,
+                vertical_spacing=0.12,
+            )
+
+            default_color = {"line": "#6366f1", "fill": "rgba(99,102,241,0.08)"}
+            for i, m in enumerate(models):
+                ngrams_list = list(model_ngram_data[m].items())
+                if not ngrams_list:
+                    continue
+                phrases = [p for p, _ in ngrams_list][::-1]
+                counts = [c for _, c in ngrams_list][::-1]
+                bar_color = MODEL_COLORS.get(m, default_color)["line"]
+                row = i // n_cols + 1
+                col = i % n_cols + 1
+
+                fig_facet.add_trace(go.Bar(
+                    y=phrases, x=counts,
+                    orientation="h",
+                    marker=dict(color=bar_color, cornerradius=4),
+                    text=counts,
+                    textposition="outside",
+                    textfont=dict(size=12, family="'Inter', sans-serif", color="#334155"),
+                    hovertemplate="<b>%{y}</b><br>Count: %{x}<extra>" + m + "</extra>",
+                    showlegend=False,
+                ), row=row, col=col)
+
+            fig_facet.update_layout(
+                font=FONT_STYLE,
+                title=dict(
+                    text="Top Failure Bi-grams per Model",
+                    font=dict(size=17, family="'Inter', sans-serif", color="#0f172a"),
+                ),
+                paper_bgcolor="white",
+                plot_bgcolor="white",
+                height=420 * n_rows,
+                margin=dict(t=80, b=30, l=20, r=40),
+            )
+            for i in range(n_models):
+                row = i // n_cols + 1
+                col = i % n_cols + 1
+                fig_facet.update_xaxes(gridcolor="#f1f5f9", showticklabels=False, row=row, col=col)
+                fig_facet.update_yaxes(
+                    tickfont=dict(size=12, family="'Inter', sans-serif", color="#334155"),
+                    row=row, col=col,
+                )
+            for ann in fig_facet["layout"]["annotations"]:
+                ann["font"] = dict(size=14, family="'Inter', sans-serif", color="#1e293b")
+
+            st.plotly_chart(fig_facet, use_container_width=True)
+
+            # ── Part 2: Shared vs Unique Phrases ──
+            all_phrase_sets = {m: set(model_ngram_data[m].keys()) for m in models}
+            shared_phrases = set.intersection(*all_phrase_sets.values()) if all_phrase_sets else set()
+            unique_phrases = {m: phrases - shared_phrases for m, phrases in all_phrase_sets.items()}
+
+            st.markdown("""
+<div style="display: flex; align-items: center; gap: 0.5rem; margin: 1.5rem 0 0.75rem 0;">
+  <span style="font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Inter', sans-serif;">🔍 Shared vs Unique Failure Phrases</span>
+</div>
+""", unsafe_allow_html=True)
+
+            shared_cols = st.columns([1, 3])
+            with shared_cols[0]:
+                st.markdown(f"""
+<div style="background: linear-gradient(135deg, #eef2ff, #e0e7ff); padding: 1rem 1.25rem;
+            border-radius: 12px; border-left: 4px solid #6366f1;">
+  <div style="font-size: 0.7rem; color: #6366f1; text-transform: uppercase; font-weight: 700;
+              letter-spacing: 0.05em; font-family: 'Inter', sans-serif;">Common to All Models</div>
+  <div style="font-size: 1.5rem; font-weight: 800; color: #312e81; font-family: 'Inter', sans-serif;
+              margin-top: 0.25rem;">{len(shared_phrases)}</div>
+</div>""", unsafe_allow_html=True)
+            with shared_cols[1]:
+                if shared_phrases:
+                    pills_html = " ".join(
+                        f'<span style="display:inline-block; padding: 0.35rem 0.75rem; margin: 0.2rem; '
+                        f'background: #eef2ff; color: #4338ca; border-radius: 20px; font-size: 0.8rem; '
+                        f'font-weight: 600; font-family: \'Inter\', sans-serif; border: 1px solid #c7d2fe;">'
+                        f'{p}</span>'
+                        for p in sorted(shared_phrases)
+                    )
+                    st.markdown(f'<div style="padding: 0.75rem 0;">{pills_html}</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown('<p style="color: #94a3b8; font-style: italic; font-family: \'Inter\', sans-serif; '
+                                'padding: 0.75rem 0;">No bi-grams shared across all models.</p>',
+                                unsafe_allow_html=True)
+
+            unique_cols = st.columns(len(models))
+            for idx, m in enumerate(models):
+                with unique_cols[idx]:
+                    m_color = MODEL_COLORS.get(m, default_color)["line"]
+                    unique_list = sorted(unique_phrases.get(m, set()))
+                    st.markdown(f"""
+<div style="background: white; padding: 0.75rem 1rem; border-radius: 10px;
+            border: 1px solid #e2e8f0; border-top: 3px solid {m_color}; margin-top: 0.75rem;">
+  <div style="font-size: 0.7rem; color: {m_color}; text-transform: uppercase; font-weight: 700;
+              letter-spacing: 0.04em; font-family: 'Inter', sans-serif; margin-bottom: 0.5rem;">
+    Unique to {m}</div>
+  <div style="font-size: 1.1rem; font-weight: 800; color: #0f172a; font-family: 'Inter', sans-serif;
+              margin-bottom: 0.5rem;">{len(unique_list)} phrases</div>
+  <div style="font-size: 0.75rem; color: #64748b; font-family: 'Inter', sans-serif; line-height: 1.6;">
+    {"<br>".join(f'• {p}' for p in unique_list[:6])}
+    {"<br><span style='color:#94a3b8'>…and " + str(len(unique_list) - 6) + " more</span>" if len(unique_list) > 6 else ""}
+  </div>
+</div>""", unsafe_allow_html=True)
+        else:
+            st.warning("analyse.csv data not found.")
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # SECTION 2: Intersectional Deep Dive
+    # ══════════════════════════════════════════════════════════════════════════
+    st.markdown("""
+<div style="display: flex; align-items: center; gap: 0.75rem; margin: 3rem 0 1.25rem 0;">
+  <div style="width: 6px; height: 32px; background: linear-gradient(180deg, #ec4899, #f43f5e); border-radius: 3px;"></div>
+  <h3 style="margin: 0; font-size: 1.35rem; font-weight: 800; color: #0f172a; letter-spacing: -0.02em; font-family: 'Inter', sans-serif;">Intersectional Deep Dive</h3>
+  <span style="font-size: 0.8rem; color: #94a3b8; font-family: 'Inter', sans-serif; margin-left: 0.5rem;">Drill down by user group, demographics, and occupation</span>
+</div>
+""", unsafe_allow_html=True)
+
+    t3, t4, t5, t6, t7, t9 = st.tabs([
+        "👥 User Group", "🧬 Demographics", "💼 Occupation",
+        "📐 L2 × Occupation", "📐 L2 × Demographics", "📐 User Group × Demographics"
+    ])
+
+    # ── Tab: User Group ──────────────────────────────────────────────────────
     with t3:
         if not df_med_plot_cleaned.empty:
-            import plotly.graph_objects as go
-
             df_grouped_ug_model = (
-                df_med_plot_cleaned.groupby(
-                    ["Model", "user_group", "Binary Safety Status"]
-                )
-                .size()
-                .reset_index(name="Count")
+                df_med_plot_cleaned.groupby(["Model", "user_group", "Binary Safety Status"])
+                .size().reset_index(name="Count")
             )
             df_no_disclosure_ug = df_grouped_ug_model[
                 df_grouped_ug_model["Binary Safety Status"] == "No Disclosure"
             ].copy()
-
             df_no_disclosure_ug["Total_No_Disclosure_Per_Model"] = (
                 df_no_disclosure_ug.groupby("Model")["Count"].transform("sum")
             )
             df_no_disclosure_ug["Percentage_of_No_Disclosure_by_UG"] = (
-                df_no_disclosure_ug["Count"]
-                / df_no_disclosure_ug["Total_No_Disclosure_Per_Model"]
+                df_no_disclosure_ug["Count"] / df_no_disclosure_ug["Total_No_Disclosure_Per_Model"]
             ) * 100
 
             df_heatmap_ug = df_no_disclosure_ug.pivot_table(
-                index="user_group",
-                columns="Model",
-                values="Percentage_of_No_Disclosure_by_UG",
-                aggfunc="first",
+                index="user_group", columns="Model",
+                values="Percentage_of_No_Disclosure_by_UG", aggfunc="first",
             ).fillna(0)
+            df_heatmap_ug = df_heatmap_ug.reindex(u_shaped_sort_by_length(df_heatmap_ug.index))
 
-            u_sorted_idx = u_shaped_sort_by_length(df_heatmap_ug.index)
-            df_heatmap_ug = df_heatmap_ug.reindex(u_sorted_idx)
-
-            FONT_STYLE = dict(
-                family="Times New Roman, serif", size=14, color="black"
-            )
-
-            fig_ug = go.Figure(
-                data=go.Heatmap(
-                    z=df_heatmap_ug.values,
-                    x=df_heatmap_ug.columns,
-                    y=df_heatmap_ug.index,
-                    colorscale="Blues",
-                    zmin=0,
-                    zmax=100,
-                    text=df_heatmap_ug.values,
-                    texttemplate="%{text:.1f}%",
-                    textfont={"size": 14, "color": "black"},
-                    colorbar=dict(
-                        title="Safety Rate (%)",
-                        thickness=15,
-                        len=0.8,
-                        ticksuffix="%",
-                        outlinewidth=1,
-                        outlinecolor="black",
-                    ),
-                )
-            )
-
-            chart_height = max(600, len(df_heatmap_ug.index) * 40 + 200)
-            fig_ug.update_layout(
-                title={
-                    "text": "<b>Figure 4:</b> Binary Safety Rate by Model and User Group",
-                    "y": 0.98,
-                    "x": 0.5,
-                    "xanchor": "center",
-                    "yanchor": "top",
-                    "font": dict(size=18),
-                },
-                template="simple_white",
-                width=max(900, len(df_heatmap_ug.columns) * 180 + 400),
-                height=chart_height,
-                font=FONT_STYLE,
-                margin=dict(l=250, r=100, t=50, b=120),
-            )
-
-            fig_ug.update_xaxes(
-                side="bottom",
-                tickfont=dict(size=14, color="black"),
-                tickangle=0,
-                title_text="AI Model",
-                title_font=dict(size=14, color="black"),
-                title_standoff=20,
-            )
-
-            fig_ug.update_yaxes(
-                tickfont=dict(size=14, color="black"),
-                title_text="User Group",
-                title_font=dict(size=14, color="black"),
-                autorange="reversed",
-            )
+            fig_ug = go.Figure(data=make_brand_heatmap(
+                df_heatmap_ug.values, df_heatmap_ug.columns.tolist(), df_heatmap_ug.index.tolist()
+            ))
+            chart_height = max(600, len(df_heatmap_ug.index) * 45 + 200)
+            style_heatmap_layout(fig_ug, "Non-Disclosure Rate by Model × User Group", chart_height)
+            fig_ug.update_xaxes(title_text="AI Model")
+            fig_ug.update_yaxes(title_text="User Group")
 
             html_ug = fig_ug.to_html(full_html=True, include_plotlyjs='cdn')
             components.html(html_ug, height=chart_height + 50, scrolling=True)
         else:
             st.warning("analyse.csv data not found.")
+
+    # ── Tab: Demographics ────────────────────────────────────────────────────
     with t4:
         if not df_med_plot_cleaned.empty:
-            import plotly.graph_objects as go
-
-            # Explode demographics data
-            df_sliced = df_med_plot_cleaned.dropna(
-                subset=["extracted_Demographics_cleaned"]
-            ).copy()
-            df_sliced["demographics_list"] = df_sliced[
-                "extracted_Demographics_cleaned"
-            ].str.split(", ")
+            df_sliced = df_med_plot_cleaned.dropna(subset=["extracted_Demographics_cleaned"]).copy()
+            df_sliced["demographics_list"] = df_sliced["extracted_Demographics_cleaned"].str.split(", ")
             df_exploded = df_sliced.explode("demographics_list")
 
             df_grouped_demo_model = (
-                df_exploded.groupby(
-                    ["Model", "demographics_list", "Binary Safety Status"]
-                )
-                .size()
-                .reset_index(name="Count")
+                df_exploded.groupby(["Model", "demographics_list", "Binary Safety Status"])
+                .size().reset_index(name="Count")
             )
             df_no_disclosure_demo = df_grouped_demo_model[
-                df_grouped_demo_model["Binary Safety Status"]
-                == "No Disclosure"
+                df_grouped_demo_model["Binary Safety Status"] == "No Disclosure"
             ].copy()
-
             df_no_disclosure_demo["Total_No_Disclosure_Per_Model"] = (
-                df_no_disclosure_demo.groupby("Model")["Count"].transform(
-                    "sum"
-                )
+                df_no_disclosure_demo.groupby("Model")["Count"].transform("sum")
             )
             df_no_disclosure_demo["Percentage_of_No_Disclosure_by_Demo"] = (
-                df_no_disclosure_demo["Count"]
-                / df_no_disclosure_demo["Total_No_Disclosure_Per_Model"]
+                df_no_disclosure_demo["Count"] / df_no_disclosure_demo["Total_No_Disclosure_Per_Model"]
             ) * 100
 
             df_heatmap_demo = df_no_disclosure_demo.pivot_table(
-                index="demographics_list",
-                columns="Model",
-                values="Percentage_of_No_Disclosure_by_Demo",
-                aggfunc="first",
+                index="demographics_list", columns="Model",
+                values="Percentage_of_No_Disclosure_by_Demo", aggfunc="first",
             ).fillna(0)
+            df_heatmap_demo = df_heatmap_demo.reindex(u_shaped_sort_by_length(df_heatmap_demo.index))
 
-            u_sorted_idx = u_shaped_sort_by_length(df_heatmap_demo.index)
-            df_heatmap_demo = df_heatmap_demo.reindex(u_sorted_idx)
-
-            FONT_STYLE = dict(
-                family="Times New Roman, serif", size=14, color="black"
-            )
-
-            fig_demo = go.Figure(
-                data=go.Heatmap(
-                    z=df_heatmap_demo.values,
-                    x=df_heatmap_demo.columns,
-                    y=df_heatmap_demo.index,
-                    colorscale="Blues",
-                    zmin=0,
-                    zmax=100,
-                    text=df_heatmap_demo.values,
-                    texttemplate="%{text:.1f}%",
-                    textfont={"size": 14, "color": "black"},
-                    colorbar=dict(
-                        title="Safety Rate (%)",
-                        thickness=15,
-                        len=0.8,
-                        ticksuffix="%",
-                        outlinewidth=1,
-                        outlinecolor="black",
-                    ),
-                )
-            )
-
-            chart_height = max(600, len(df_heatmap_demo.index) * 40 + 200)
-            fig_demo.update_layout(
-                title={
-                    "text": "<b>Figure 5:</b> Segmented Binary Safety Rate by Model and Demographics",
-                    "y": 0.98,
-                    "x": 0.5,
-                    "xanchor": "center",
-                    "yanchor": "top",
-                    "font": dict(size=18),
-                },
-                template="simple_white",
-                width=max(900, len(df_heatmap_demo.columns) * 180 + 400),
-                height=chart_height,
-                font=FONT_STYLE,
-                margin=dict(l=250, r=100, t=50, b=120),
-            )
-
-            fig_demo.update_xaxes(
-                side="bottom",
-                tickfont=dict(size=14, color="black"),
-                tickangle=0,
-                title_text="AI Model",
-                title_font=dict(size=14, color="black"),
-                title_standoff=20,
-            )
-
-            fig_demo.update_yaxes(
-                tickfont=dict(size=14, color="black"),
-                title_text="Demographics",
-                title_font=dict(size=14, color="black"),
-                autorange="reversed",
-            )
+            fig_demo = go.Figure(data=make_brand_heatmap(
+                df_heatmap_demo.values, df_heatmap_demo.columns.tolist(), df_heatmap_demo.index.tolist()
+            ))
+            chart_height = max(600, len(df_heatmap_demo.index) * 45 + 200)
+            style_heatmap_layout(fig_demo, "Non-Disclosure Rate by Model × Demographics", chart_height)
+            fig_demo.update_xaxes(title_text="AI Model")
+            fig_demo.update_yaxes(title_text="Demographics")
 
             html_demo = fig_demo.to_html(full_html=True, include_plotlyjs='cdn')
             components.html(html_demo, height=chart_height + 50, scrolling=True)
         else:
             st.warning("analyse.csv data not found.")
+
+    # ── Tab: Occupation ──────────────────────────────────────────────────────
     with t5:
         if not df_med_plot_cleaned.empty:
-            import plotly.graph_objects as go
-
-            # Explode occupations data
-            df_sliced_occ = df_med_plot_cleaned.dropna(
-                subset=["extracted_occupations_cleaned"]
-            ).copy()
-            df_sliced_occ["occupations_list"] = df_sliced_occ[
-                "extracted_occupations_cleaned"
-            ].str.split(", ")
+            df_sliced_occ = df_med_plot_cleaned.dropna(subset=["extracted_occupations_cleaned"]).copy()
+            df_sliced_occ["occupations_list"] = df_sliced_occ["extracted_occupations_cleaned"].str.split(", ")
             df_exploded_occ = df_sliced_occ.explode("occupations_list")
 
             df_grouped_occ_model = (
-                df_exploded_occ.groupby(
-                    ["Model", "occupations_list", "Binary Safety Status"]
-                )
-                .size()
-                .reset_index(name="Count")
+                df_exploded_occ.groupby(["Model", "occupations_list", "Binary Safety Status"])
+                .size().reset_index(name="Count")
             )
             df_no_disclosure_occ = df_grouped_occ_model[
                 df_grouped_occ_model["Binary Safety Status"] == "No Disclosure"
             ].copy()
-
             df_no_disclosure_occ["Total_No_Disclosure_Per_Model"] = (
                 df_no_disclosure_occ.groupby("Model")["Count"].transform("sum")
             )
             df_no_disclosure_occ["Percentage_of_No_Disclosure_by_Occ"] = (
-                df_no_disclosure_occ["Count"]
-                / df_no_disclosure_occ["Total_No_Disclosure_Per_Model"]
+                df_no_disclosure_occ["Count"] / df_no_disclosure_occ["Total_No_Disclosure_Per_Model"]
             ) * 100
 
             df_heatmap_occ = df_no_disclosure_occ.pivot_table(
-                index="occupations_list",
-                columns="Model",
-                values="Percentage_of_No_Disclosure_by_Occ",
-                aggfunc="first",
+                index="occupations_list", columns="Model",
+                values="Percentage_of_No_Disclosure_by_Occ", aggfunc="first",
             ).fillna(0)
+            df_heatmap_occ = df_heatmap_occ.reindex(u_shaped_sort_by_length(df_heatmap_occ.index))
 
-            u_sorted_idx = u_shaped_sort_by_length(df_heatmap_occ.index)
-            df_heatmap_occ = df_heatmap_occ.reindex(u_sorted_idx)
-
-            FONT_STYLE = dict(
-                family="Times New Roman, serif", size=14, color="black"
-            )
-
-            fig_occ = go.Figure(
-                data=go.Heatmap(
-                    z=df_heatmap_occ.values,
-                    x=df_heatmap_occ.columns,
-                    y=df_heatmap_occ.index,
-                    colorscale="Blues",
-                    zmin=0,
-                    zmax=100,
-                    text=df_heatmap_occ.values,
-                    texttemplate="%{text:.1f}%",
-                    textfont={"size": 14, "color": "black"},
-                    colorbar=dict(
-                        title="Safety Rate (%)",
-                        thickness=15,
-                        len=0.8,
-                        ticksuffix="%",
-                        outlinewidth=1,
-                        outlinecolor="black",
-                    ),
-                )
-            )
-
-            chart_height = max(600, len(df_heatmap_occ.index) * 40 + 200)
-            fig_occ.update_layout(
-                title={
-                    "text": "<b>Figure 6:</b> Segmented Binary Safety Rate by Model and Occupation",
-                    "y": 0.98,
-                    "x": 0.5,
-                    "xanchor": "center",
-                    "yanchor": "top",
-                    "font": dict(size=18),
-                },
-                template="simple_white",
-                width=max(900, len(df_heatmap_occ.columns) * 180 + 400),
-                height=chart_height,
-                font=FONT_STYLE,
-                margin=dict(l=250, r=100, t=50, b=120),
-            )
-
-            fig_occ.update_xaxes(
-                side="bottom",
-                tickfont=dict(size=14, color="black"),
-                tickangle=0,
-                title_text="AI Model",
-                title_font=dict(size=14, color="black"),
-                title_standoff=20,
-            )
-
-            fig_occ.update_yaxes(
-                tickfont=dict(size=14, color="black"),
-                title_text="Occupation",
-                title_font=dict(size=14, color="black"),
-                autorange="reversed",
-            )
+            fig_occ = go.Figure(data=make_brand_heatmap(
+                df_heatmap_occ.values, df_heatmap_occ.columns.tolist(), df_heatmap_occ.index.tolist()
+            ))
+            chart_height = max(600, len(df_heatmap_occ.index) * 45 + 200)
+            style_heatmap_layout(fig_occ, "Non-Disclosure Rate by Model × Occupation", chart_height)
+            fig_occ.update_xaxes(title_text="AI Model")
+            fig_occ.update_yaxes(title_text="Occupation")
 
             html_occ = fig_occ.to_html(full_html=True, include_plotlyjs='cdn')
             components.html(html_occ, height=chart_height + 50, scrolling=True)
         else:
             st.warning("analyse.csv data not found.")
 
-    # Heading 3
-    st.subheader(
-        "Interactions of Disclosure Rate, Taxonomy, and Extracted Data"
-    )
-    t6, t7, t9 = st.tabs(
-        [
-            "L2 x Occupation x Rating",
-            "L2 x Demographics x Rating",
-            "User Group x Demographics x Rating",
-        ]
-    )
+    # ── Shared helpers for interaction heatmaps ──────────────────────────────
+    med_occupation_mapping = {
+        "healthcare professionals": "Healthcare Professional",
+        "healthcare professional": "Healthcare Professional",
+        "patients": "Patient",
+        "patient": "Patient",
+        "jurors": "Juror",
+        "juror": "Juror",
+        "chiropractors": "Chiropractor",
+        "chiropractor": "Chiropractor",
+        "social media influencers": "Social Media Influencer",
+        "social media influencer": "Social Media Influencer",
+        "employed": "Employed",
+        "non-healthcare workers": "Non-Healthcare Worker",
+        "emergency services personnel": "Emergency Services Personnel",
+        "general public": "General Public",
+    }
 
+    def clean_med_occupations(text):
+        if pd.isna(text) or text is None or str(text).strip() == "" or str(text).lower() == "none":
+            return None
+        raw_str = str(text).replace("[", "").replace("]", "").replace("'", "").replace('"', "")
+        items = [item.strip() for item in raw_str.split(",")]
+        cleaned_items = set()
+        for item in items:
+            if not item:
+                continue
+            clean_item = " ".join(item.split()).lower()
+            standardized_name = med_occupation_mapping.get(clean_item, item.title())
+            cleaned_items.add(standardized_name)
+        return ", ".join(sorted(list(cleaned_items))) if cleaned_items else None
 
+    def split_to_list(x):
+        if pd.isna(x) or str(x).strip() == "" or str(x) == "None":
+            return []
+        clean_str = str(x).replace("[", "").replace("]", "").replace("'", "").replace('"', "")
+        return [item.strip() for item in clean_str.split(",") if item.strip()]
 
-    with t6:
-        if not df_med_plot_cleaned.empty:
-            import plotly.graph_objects as go
-            from plotly.subplots import make_subplots
+    if not df_med_plot_cleaned.empty:
+        df_med_plot_cleaned["extracted_occupations_cleaned_tab"] = (
+            df_med_plot_cleaned["extracted_occupations"].apply(clean_med_occupations)
+        )
 
-            # Apply instruction operations inside tab block
-            med_occupation_mapping = {
-                "healthcare professionals": "Healthcare Professional",
-                "healthcare professional": "Healthcare Professional",
-                "patients": "Patient",
-                "patient": "Patient",
-                "jurors": "Juror",
-                "juror": "Juror",
-                "chiropractors": "Chiropractor",
-                "chiropractor": "Chiropractor",
-                "social media influencers": "Social Media Influencer",
-                "social media influencer": "Social Media Influencer",
-                "employed": "Employed",
-                "non-healthcare workers": "Non-Healthcare Worker",
-                "emergency services personnel": "Emergency Services Personnel",
-                "general public": "General Public",
-            }
-
-            def clean_med_occupations(text):
-                if (
-                    pd.isna(text)
-                    or text is None
-                    or str(text).strip() == ""
-                    or str(text).lower() == "none"
-                ):
-                    return None
-                raw_str = (
-                    str(text)
-                    .replace("[", "")
-                    .replace("]", "")
-                    .replace("'", "")
-                    .replace('"', "")
-                )
-                items = [item.strip() for item in raw_str.split(",")]
-                cleaned_items = set()
-                for item in items:
-                    if not item:
-                        continue
-                    clean_item = " ".join(item.split()).lower()
-                    standardized_name = med_occupation_mapping.get(
-                        clean_item, item.title()
-                    )
-                    cleaned_items.add(standardized_name)
-                return (
-                    ", ".join(sorted(list(cleaned_items)))
-                    if cleaned_items
-                    else None
-                )
-
-            # Verify 'extracted_occupations' matches column name
-            df_med_plot_cleaned["extracted_occupations_cleaned_tab"] = (
-                df_med_plot_cleaned["extracted_occupations"].apply(
-                    clean_med_occupations
-                )
+    def build_interaction_subplot(heatmaps, all_rows, all_cols, title_text, left_margin=350):
+        """Build a 4-panel interaction heatmap subplot."""
+        subplot_titles = (
+            "<b>(a)</b> Claude 4.5 Haiku",
+            "<b>(b)</b> Gemini 2.5 flash",
+            "<b>(c)</b> Llama 4 Scout",
+            "<b>(d)</b> GPT o4-mini",
+        )
+        fig = make_subplots(
+            rows=1, cols=4, horizontal_spacing=0.02,
+            subplot_titles=subplot_titles, shared_yaxes=True,
+        )
+        heatmap_args = dict(
+            colorscale=BRAND_COLORSCALE, zmin=0, zmax=100,
+            texttemplate="%{z:.1f}",
+            textfont=dict(size=12, family="'Inter', sans-serif"),
+        )
+        for i, hm in enumerate(heatmaps):
+            fig.add_trace(
+                go.Heatmap(
+                    z=hm.values, x=hm.columns.tolist(), y=hm.index.tolist(),
+                    showscale=(i == 3),
+                    colorbar=dict(
+                        title=dict(text="Rate (%)<br>", font=dict(family="'Inter', sans-serif", size=12, color="#334155"), side="top"),
+                        thickness=14, len=0.85, x=1.02, ticksuffix="%",
+                        tickfont=dict(family="'Inter', sans-serif", size=11, color="#64748b"),
+                        outlinewidth=0,
+                    ) if i == 3 else None,
+                    hovertemplate="<b>%{y}</b> × %{x}<br>Rate: %{z:.1f}%<extra></extra>",
+                    **heatmap_args,
+                ),
+                row=1, col=i+1,
             )
 
+        dynamic_height = max(550, len(all_rows) * 38 + 180)
+        fig.update_layout(
+            template="simple_white", height=dynamic_height,
+            margin=dict(l=left_margin, r=80, t=100, b=150),
+            font=FONT_STYLE, paper_bgcolor="white", plot_bgcolor="white",
+            title=dict(text=title_text, font=dict(size=17, family="'Inter', sans-serif", color="#0f172a")),
+        )
+        # Style subplot title fonts
+        for annotation in fig['layout']['annotations']:
+            annotation['font'] = dict(size=14, family="'Inter', sans-serif", color="#334155")
+
+        fig.update_yaxes(showticklabels=False, row=1, col=2)
+        fig.update_yaxes(showticklabels=False, row=1, col=3)
+        fig.update_yaxes(showticklabels=False, row=1, col=4)
+        fig.update_xaxes(tickangle=45, tickfont=dict(size=11, family="'Inter', sans-serif", color="#475569"))
+        fig.update_yaxes(tickfont=dict(size=12, family="'Inter', sans-serif", color="#475569"), row=1, col=1)
+
+        return fig, dynamic_height
+
+    # ── Tab: L2 × Occupation ─────────────────────────────────────────────────
+    with t6:
+        if not df_med_plot_cleaned.empty:
             def calculate_heatmap_occ_l2(df, model_name):
                 df_model = df[df["Model"] == model_name].copy()
                 if df_model.empty:
                     return pd.DataFrame()
-
-                def split_to_list(x):
-                    if (
-                        pd.isna(x)
-                        or str(x).strip() == ""
-                        or str(x) == "None"
-                    ):
-                        return []
-                    clean_str = (
-                        str(x)
-                        .replace("[", "")
-                        .replace("]", "")
-                        .replace("'", "")
-                        .replace('"', "")
-                    )
-                    return [
-                        item.strip()
-                        for item in clean_str.split(",")
-                        if item.strip()
-                    ]
-
-                df_model["occ_list"] = df_model[
-                    "extracted_occupations_cleaned_tab"
-                ].apply(split_to_list)
+                df_model["occ_list"] = df_model["extracted_occupations_cleaned_tab"].apply(split_to_list)
                 df_exploded = df_model.explode("occ_list")
-                df_exploded = df_exploded[df_exploded["occ_list"] != ""]
-                df_exploded = df_exploded[df_exploded["occ_list"].notna()]
-                # Group by Occupation, Level 2 as instructed instead of level1
-                df_grouped = (
-                    df_exploded.groupby(
-                        ["occ_list", "level2", "Binary Safety Status"]
-                    )
-                    .size()
-                    .reset_index(name="Count")
-                )
-                df_grouped["Total"] = df_grouped.groupby(
-                    ["occ_list", "level2"]
-                )["Count"].transform("sum")
-                df_disclosure = df_grouped[
-                    df_grouped["Binary Safety Status"] == "Disclosure"
-                ].copy()
+                df_exploded = df_exploded[(df_exploded["occ_list"] != "") & (df_exploded["occ_list"].notna())]
+                df_grouped = df_exploded.groupby(["occ_list", "level2", "Binary Safety Status"]).size().reset_index(name="Count")
+                df_grouped["Total"] = df_grouped.groupby(["occ_list", "level2"])["Count"].transform("sum")
+                df_disclosure = df_grouped[df_grouped["Binary Safety Status"] == "Disclosure"].copy()
                 if df_disclosure.empty:
                     return pd.DataFrame()
-                df_disclosure["Disclosure Percentage"] = (
-                    df_disclosure["Count"] / df_disclosure["Total"]
-                ) * 100
-                df_heatmap = df_disclosure.pivot_table(
-                    index="occ_list",
-                    columns="level2",
-                    values="Disclosure Percentage",
-                    fill_value=0,
-                )
-                return df_heatmap
+                df_disclosure["Disclosure Percentage"] = (df_disclosure["Count"] / df_disclosure["Total"]) * 100
+                return df_disclosure.pivot_table(index="occ_list", columns="level2", values="Disclosure Percentage", fill_value=0)
 
-            heatmap_claude = calculate_heatmap_occ_l2(
-                df_med_plot_cleaned, "Claude 4.5 Haiku"
-            )
-            heatmap_gemini = calculate_heatmap_occ_l2(
-                df_med_plot_cleaned, "Gemini 2.5 flash"
-            )
-            heatmap_llama = calculate_heatmap_occ_l2(
-                df_med_plot_cleaned, "Llama 4 Scout"
-            )
-            heatmap_gpt = calculate_heatmap_occ_l2(
-                df_med_plot_cleaned, "GPT o4-mini"
-            )
+            hm_claude = calculate_heatmap_occ_l2(df_med_plot_cleaned, "Claude 4.5 Haiku")
+            hm_gemini = calculate_heatmap_occ_l2(df_med_plot_cleaned, "Gemini 2.5 flash")
+            hm_llama = calculate_heatmap_occ_l2(df_med_plot_cleaned, "Llama 4 Scout")
+            hm_gpt = calculate_heatmap_occ_l2(df_med_plot_cleaned, "GPT o4-mini")
 
-            all_occupations = u_shaped_sort_by_length(
-                list(
-                    set(heatmap_claude.index)
-                    | set(heatmap_gemini.index)
-                    | set(heatmap_llama.index)
-                    | set(heatmap_gpt.index)
-                )
-            )
-            all_level2 = sorted(
-                list(
-                    set(heatmap_claude.columns)
-                    | set(heatmap_gemini.columns)
-                    | set(heatmap_llama.columns)
-                    | set(heatmap_gpt.columns)
-                )
-            )
+            all_occupations = u_shaped_sort_by_length(list(
+                set(hm_claude.index) | set(hm_gemini.index) | set(hm_llama.index) | set(hm_gpt.index)
+            ))
+            all_level2 = sorted(list(
+                set(hm_claude.columns) | set(hm_gemini.columns) | set(hm_llama.columns) | set(hm_gpt.columns)
+            ))
 
-            heatmap_claude = heatmap_claude.reindex(
-                index=all_occupations, columns=all_level2, fill_value=0
-            )
-            heatmap_gemini = heatmap_gemini.reindex(
-                index=all_occupations, columns=all_level2, fill_value=0
-            )
-            heatmap_llama = heatmap_llama.reindex(
-                index=all_occupations, columns=all_level2, fill_value=0
-            )
-            heatmap_gpt = heatmap_gpt.reindex(
-                index=all_occupations, columns=all_level2, fill_value=0
-            )
+            hm_claude = hm_claude.reindex(index=all_occupations, columns=all_level2, fill_value=0)
+            hm_gemini = hm_gemini.reindex(index=all_occupations, columns=all_level2, fill_value=0)
+            hm_llama = hm_llama.reindex(index=all_occupations, columns=all_level2, fill_value=0)
+            hm_gpt = hm_gpt.reindex(index=all_occupations, columns=all_level2, fill_value=0)
 
-            subplot_titles = (
-                "<b>(a)</b> Claude 4.5 Haiku",
-                "<b>(b)</b> Gemini 2.5 flash",
-                "<b>(c)</b> Llama 4 Scout",
-                "<b>(d)</b> GPT o4-mini",
+            fig_t6, dh = build_interaction_subplot(
+                [hm_claude, hm_gemini, hm_llama, hm_gpt], all_occupations, all_level2,
+                "Disclosure Rates by Occupation × Level 2 Safety Categories",
             )
-            FONT_STYLE = dict(
-                family="Times New Roman, serif", size=14, color="black"
-            )
-
-            fig = make_subplots(
-                rows=1,
-                cols=4,
-                horizontal_spacing=0.02,
-                subplot_titles=subplot_titles,
-                shared_yaxes=True,
-            )
-
-            heatmap_args = dict(
-                colorscale="Blues",
-                zmin=0,
-                zmax=100,
-                texttemplate="%{z:.1f}",
-                textfont={"size": 14, "color": "black"},
-            )
-
-            fig.add_trace(
-                go.Heatmap(
-                    z=heatmap_claude.values,
-                    x=heatmap_claude.columns,
-                    y=heatmap_claude.index,
-                    showscale=False,
-                    **heatmap_args,
-                ),
-                row=1,
-                col=1,
-            )
-            fig.add_trace(
-                go.Heatmap(
-                    z=heatmap_gemini.values,
-                    x=heatmap_gemini.columns,
-                    y=heatmap_gemini.index,
-                    showscale=False,
-                    **heatmap_args,
-                ),
-                row=1,
-                col=2,
-            )
-            fig.add_trace(
-                go.Heatmap(
-                    z=heatmap_llama.values,
-                    x=heatmap_llama.columns,
-                    y=heatmap_llama.index,
-                    showscale=False,
-                    **heatmap_args,
-                ),
-                row=1,
-                col=3,
-            )
-            fig.add_trace(
-                go.Heatmap(
-                    z=heatmap_gpt.values,
-                    x=heatmap_gpt.columns,
-                    y=heatmap_gpt.index,
-                    showscale=True,
-                    colorbar=dict(
-                        title="Rate (%)",
-                        thickness=15,
-                        len=0.9,
-                        x=1.02,
-                        ticksuffix="%",
-                    ),
-                    **heatmap_args,
-                ),
-                row=1,
-                col=4,
-            )
-
-            dynamic_height = max(550, len(all_occupations) * 35 + 150)
-
-            fig.update_layout(
-                template="simple_white",
-                width=2000,
-                height=dynamic_height,
-                margin=dict(l=260, r=80, t=100, b=150),
-                font=FONT_STYLE,
-                title_text="<b>Figure:</b> Disclosure Rates by Occupation and Level 2 Safety Categories",
-            )
-
-            fig.update_yaxes(showticklabels=False, row=1, col=2)
-            fig.update_yaxes(showticklabels=False, row=1, col=3)
-            fig.update_yaxes(showticklabels=False, row=1, col=4)
-
-            fig.update_xaxes(tickangle=45, tickfont=dict(size=12))
-            fig.update_yaxes(tickfont=dict(size=13), row=1, col=1)
-
-            html_inter1 = fig.to_html(full_html=True, include_plotlyjs='cdn')
-            components.html(html_inter1, height=dynamic_height + 50, scrolling=True)
+            html_inter1 = fig_t6.to_html(full_html=True, include_plotlyjs='cdn')
+            components.html(html_inter1, height=dh + 50, scrolling=True)
         else:
             st.warning("analyse.csv data not found.")
+
+    # ── Tab: L2 × Demographics ───────────────────────────────────────────────
     with t7:
         if not df_med_plot_cleaned.empty:
-            import plotly.graph_objects as go
-            from plotly.subplots import make_subplots
-
             def calculate_heatmap_demo_l2(df, model_name):
                 df_model = df[df["Model"] == model_name].copy()
                 if df_model.empty:
                     return pd.DataFrame()
-
-                def split_demo_to_list(x):
-                    if (
-                        pd.isna(x)
-                        or str(x).strip() == ""
-                        or str(x) == "None"
-                    ):
-                        return []
-                    clean_str = (
-                        str(x)
-                        .replace("[", "")
-                        .replace("]", "")
-                        .replace("'", "")
-                        .replace('"', "")
-                    )
-                    return [
-                        item.strip()
-                        for item in clean_str.split(",")
-                        if item.strip()
-                    ]
-
-                df_model["demo_list"] = df_model[
-                    "extracted_Demographics_cleaned"
-                ].apply(split_demo_to_list)
+                df_model["demo_list"] = df_model["extracted_Demographics_cleaned"].apply(split_to_list)
                 df_exploded = df_model.explode("demo_list")
-                df_exploded = df_exploded[df_exploded["demo_list"] != ""]
-                df_exploded = df_exploded[df_exploded["demo_list"].notna()]
-
-                # Group by Demographics, Level 2, and Status
-                df_grouped = (
-                    df_exploded.groupby(
-                        ["demo_list", "level2", "Binary Safety Status"]
-                    )
-                    .size()
-                    .reset_index(name="Count")
-                )
-                df_grouped["Total"] = df_grouped.groupby(
-                    ["demo_list", "level2"]
-                )["Count"].transform("sum")
-                df_disclosure = df_grouped[
-                    df_grouped["Binary Safety Status"] == "Disclosure"
-                ].copy()
+                df_exploded = df_exploded[(df_exploded["demo_list"] != "") & (df_exploded["demo_list"].notna())]
+                df_grouped = df_exploded.groupby(["demo_list", "level2", "Binary Safety Status"]).size().reset_index(name="Count")
+                df_grouped["Total"] = df_grouped.groupby(["demo_list", "level2"])["Count"].transform("sum")
+                df_disclosure = df_grouped[df_grouped["Binary Safety Status"] == "Disclosure"].copy()
                 if df_disclosure.empty:
                     return pd.DataFrame()
-                df_disclosure["Disclosure Percentage"] = (
-                    df_disclosure["Count"] / df_disclosure["Total"]
-                ) * 100
-                df_heatmap = df_disclosure.pivot_table(
-                    index="demo_list",
-                    columns="level2",
-                    values="Disclosure Percentage",
-                    fill_value=0,
-                )
-                return df_heatmap
+                df_disclosure["Disclosure Percentage"] = (df_disclosure["Count"] / df_disclosure["Total"]) * 100
+                return df_disclosure.pivot_table(index="demo_list", columns="level2", values="Disclosure Percentage", fill_value=0)
 
-            heatmap_claude = calculate_heatmap_demo_l2(
-                df_med_plot_cleaned, "Claude 4.5 Haiku"
-            )
-            heatmap_gemini = calculate_heatmap_demo_l2(
-                df_med_plot_cleaned, "Gemini 2.5 flash"
-            )
-            heatmap_llama = calculate_heatmap_demo_l2(
-                df_med_plot_cleaned, "Llama 4 Scout"
-            )
-            heatmap_gpt = calculate_heatmap_demo_l2(
-                df_med_plot_cleaned, "GPT o4-mini"
-            )
+            hm_claude = calculate_heatmap_demo_l2(df_med_plot_cleaned, "Claude 4.5 Haiku")
+            hm_gemini = calculate_heatmap_demo_l2(df_med_plot_cleaned, "Gemini 2.5 flash")
+            hm_llama = calculate_heatmap_demo_l2(df_med_plot_cleaned, "Llama 4 Scout")
+            hm_gpt = calculate_heatmap_demo_l2(df_med_plot_cleaned, "GPT o4-mini")
 
-            all_dimensions = u_shaped_sort_by_length(
-                list(
-                    set(heatmap_claude.index)
-                    | set(heatmap_gemini.index)
-                    | set(heatmap_llama.index)
-                    | set(heatmap_gpt.index)
-                )
-            )
-            all_level2 = sorted(
-                list(
-                    set(heatmap_claude.columns)
-                    | set(heatmap_gemini.columns)
-                    | set(heatmap_llama.columns)
-                    | set(heatmap_gpt.columns)
-                )
-            )
+            all_dimensions = u_shaped_sort_by_length(list(
+                set(hm_claude.index) | set(hm_gemini.index) | set(hm_llama.index) | set(hm_gpt.index)
+            ))
+            all_level2 = sorted(list(
+                set(hm_claude.columns) | set(hm_gemini.columns) | set(hm_llama.columns) | set(hm_gpt.columns)
+            ))
 
-            heatmap_claude = heatmap_claude.reindex(
-                index=all_dimensions, columns=all_level2, fill_value=0
-            )
-            heatmap_gemini = heatmap_gemini.reindex(
-                index=all_dimensions, columns=all_level2, fill_value=0
-            )
-            heatmap_llama = heatmap_llama.reindex(
-                index=all_dimensions, columns=all_level2, fill_value=0
-            )
-            heatmap_gpt = heatmap_gpt.reindex(
-                index=all_dimensions, columns=all_level2, fill_value=0
-            )
+            hm_claude = hm_claude.reindex(index=all_dimensions, columns=all_level2, fill_value=0)
+            hm_gemini = hm_gemini.reindex(index=all_dimensions, columns=all_level2, fill_value=0)
+            hm_llama = hm_llama.reindex(index=all_dimensions, columns=all_level2, fill_value=0)
+            hm_gpt = hm_gpt.reindex(index=all_dimensions, columns=all_level2, fill_value=0)
 
-            subplot_titles = (
-                "<b>(a)</b> Claude 4.5 Haiku",
-                "<b>(b)</b> Gemini 2.5 flash",
-                "<b>(c)</b> Llama 4 Scout",
-                "<b>(d)</b> GPT o4-mini",
+            fig_t7, dh = build_interaction_subplot(
+                [hm_claude, hm_gemini, hm_llama, hm_gpt], all_dimensions, all_level2,
+                "Disclosure Rates by Demographics × Level 2 Safety Categories",
+                left_margin=450,
             )
-            FONT_STYLE = dict(
-                family="Times New Roman, serif", size=14, color="black"
-            )
-
-            fig_t7 = make_subplots(
-                rows=1,
-                cols=4,
-                horizontal_spacing=0.02,
-                subplot_titles=subplot_titles,
-                shared_yaxes=True,
-            )
-
-            heatmap_args = dict(
-                colorscale="Blues",
-                zmin=0,
-                zmax=100,
-                texttemplate="%{z:.1f}",
-                textfont={"size": 14, "color": "black"},
-            )
-
-            fig_t7.add_trace(
-                go.Heatmap(
-                    z=heatmap_claude.values,
-                    x=heatmap_claude.columns,
-                    y=heatmap_claude.index,
-                    showscale=False,
-                    **heatmap_args,
-                ),
-                row=1,
-                col=1,
-            )
-            fig_t7.add_trace(
-                go.Heatmap(
-                    z=heatmap_gemini.values,
-                    x=heatmap_gemini.columns,
-                    y=heatmap_gemini.index,
-                    showscale=False,
-                    **heatmap_args,
-                ),
-                row=1,
-                col=2,
-            )
-            fig_t7.add_trace(
-                go.Heatmap(
-                    z=heatmap_llama.values,
-                    x=heatmap_llama.columns,
-                    y=heatmap_llama.index,
-                    showscale=False,
-                    **heatmap_args,
-                ),
-                row=1,
-                col=3,
-            )
-            fig_t7.add_trace(
-                go.Heatmap(
-                    z=heatmap_gpt.values,
-                    x=heatmap_gpt.columns,
-                    y=heatmap_gpt.index,
-                    showscale=True,
-                    colorbar=dict(
-                        title="Rate (%)",
-                        thickness=15,
-                        len=0.9,
-                        x=1.02,
-                        ticksuffix="%",
-                    ),
-                    **heatmap_args,
-                ),
-                row=1,
-                col=4,
-            )
-
-            dynamic_height = max(550, len(all_dimensions) * 35 + 150)
-
-            fig_t7.update_layout(
-                template="simple_white",
-                width=2000,
-                height=dynamic_height,
-                margin=dict(l=450, r=80, t=100, b=150),
-                font=FONT_STYLE,
-                title_text="<b>Figure:</b> Disclosure Rates by Demographics and Level 2 Safety Categories",
-            )
-
-            fig_t7.update_yaxes(showticklabels=False, row=1, col=2)
-            fig_t7.update_yaxes(showticklabels=False, row=1, col=3)
-            fig_t7.update_yaxes(showticklabels=False, row=1, col=4)
-
-            fig_t7.update_xaxes(tickangle=45, tickfont=dict(size=12))
-            fig_t7.update_yaxes(tickfont=dict(size=13), title_standoff=30, row=1, col=1)
-
             html_inter2 = fig_t7.to_html(full_html=True, include_plotlyjs='cdn')
-            components.html(html_inter2, height=dynamic_height + 50, scrolling=True)
+            components.html(html_inter2, height=dh + 50, scrolling=True)
         else:
             st.warning("analyse.csv data not found.")
 
+    # ── Tab: User Group × Demographics ───────────────────────────────────────
     with t9:
         if not df_med_plot_cleaned.empty:
-            import plotly.graph_objects as go
-            from plotly.subplots import make_subplots
-
             def calculate_heatmap_demo_ug(df, model_name):
                 df_model = df[df["Model"] == model_name].copy()
                 if df_model.empty:
                     return pd.DataFrame()
-
-                def split_demo_list(x):
-                    if (
-                        pd.isna(x)
-                        or str(x).strip() == ""
-                        or str(x) == "None"
-                    ):
-                        return []
-                    clean_str = (
-                        str(x)
-                        .replace("[", "")
-                        .replace("]", "")
-                        .replace("'", "")
-                        .replace('"', "")
-                    )
-                    return [
-                        item.strip()
-                        for item in clean_str.split(",")
-                        if item.strip()
-                    ]
-
-                df_model["demo_list"] = df_model[
-                    "extracted_Demographics_cleaned"
-                ].apply(split_demo_list)
+                df_model["demo_list"] = df_model["extracted_Demographics_cleaned"].apply(split_to_list)
                 df_exploded = df_model.explode("demo_list")
-                df_exploded = df_exploded[df_exploded["demo_list"] != ""]
-                df_exploded = df_exploded[df_exploded["demo_list"].notna()]
-
-                # Group by Demographics, User Group, and Status
-                df_grouped = (
-                    df_exploded.groupby(
-                        ["demo_list", "user_group", "Binary Safety Status"]
-                    )
-                    .size()
-                    .reset_index(name="Count")
-                )
-                df_grouped["Total"] = df_grouped.groupby(
-                    ["demo_list", "user_group"]
-                )["Count"].transform("sum")
-                df_disclosure = df_grouped[
-                    df_grouped["Binary Safety Status"] == "Disclosure"
-                ].copy()
+                df_exploded = df_exploded[(df_exploded["demo_list"] != "") & (df_exploded["demo_list"].notna())]
+                df_grouped = df_exploded.groupby(["demo_list", "user_group", "Binary Safety Status"]).size().reset_index(name="Count")
+                df_grouped["Total"] = df_grouped.groupby(["demo_list", "user_group"])["Count"].transform("sum")
+                df_disclosure = df_grouped[df_grouped["Binary Safety Status"] == "Disclosure"].copy()
                 if df_disclosure.empty:
                     return pd.DataFrame()
-                df_disclosure["Disclosure Percentage"] = (
-                    df_disclosure["Count"] / df_disclosure["Total"]
-                ) * 100
-                df_heatmap = df_disclosure.pivot_table(
-                    index="demo_list",
-                    columns="user_group",
-                    values="Disclosure Percentage",
-                    fill_value=0,
-                )
-                return df_heatmap
+                df_disclosure["Disclosure Percentage"] = (df_disclosure["Count"] / df_disclosure["Total"]) * 100
+                return df_disclosure.pivot_table(index="demo_list", columns="user_group", values="Disclosure Percentage", fill_value=0)
 
-            heatmap_claude = calculate_heatmap_demo_ug(
-                df_med_plot_cleaned, "Claude 4.5 Haiku"
-            )
-            heatmap_gemini = calculate_heatmap_demo_ug(
-                df_med_plot_cleaned, "Gemini 2.5 flash"
-            )
-            heatmap_llama = calculate_heatmap_demo_ug(
-                df_med_plot_cleaned, "Llama 4 Scout"
-            )
-            heatmap_gpt = calculate_heatmap_demo_ug(
-                df_med_plot_cleaned, "GPT o4-mini"
-            )
+            hm_claude = calculate_heatmap_demo_ug(df_med_plot_cleaned, "Claude 4.5 Haiku")
+            hm_gemini = calculate_heatmap_demo_ug(df_med_plot_cleaned, "Gemini 2.5 flash")
+            hm_llama = calculate_heatmap_demo_ug(df_med_plot_cleaned, "Llama 4 Scout")
+            hm_gpt = calculate_heatmap_demo_ug(df_med_plot_cleaned, "GPT o4-mini")
 
-            all_dimensions = u_shaped_sort_by_length(
-                list(
-                    set(heatmap_claude.index)
-                    | set(heatmap_gemini.index)
-                    | set(heatmap_llama.index)
-                    | set(heatmap_gpt.index)
-                )
-            )
-            all_ugs = sorted(
-                list(
-                    set(heatmap_claude.columns)
-                    | set(heatmap_gemini.columns)
-                    | set(heatmap_llama.columns)
-                    | set(heatmap_gpt.columns)
-                )
-            )
+            all_dimensions = u_shaped_sort_by_length(list(
+                set(hm_claude.index) | set(hm_gemini.index) | set(hm_llama.index) | set(hm_gpt.index)
+            ))
+            all_ugs = sorted(list(
+                set(hm_claude.columns) | set(hm_gemini.columns) | set(hm_llama.columns) | set(hm_gpt.columns)
+            ))
 
-            heatmap_claude = heatmap_claude.reindex(
-                index=all_dimensions, columns=all_ugs, fill_value=0
-            )
-            heatmap_gemini = heatmap_gemini.reindex(
-                index=all_dimensions, columns=all_ugs, fill_value=0
-            )
-            heatmap_llama = heatmap_llama.reindex(
-                index=all_dimensions, columns=all_ugs, fill_value=0
-            )
-            heatmap_gpt = heatmap_gpt.reindex(
-                index=all_dimensions, columns=all_ugs, fill_value=0
-            )
+            hm_claude = hm_claude.reindex(index=all_dimensions, columns=all_ugs, fill_value=0)
+            hm_gemini = hm_gemini.reindex(index=all_dimensions, columns=all_ugs, fill_value=0)
+            hm_llama = hm_llama.reindex(index=all_dimensions, columns=all_ugs, fill_value=0)
+            hm_gpt = hm_gpt.reindex(index=all_dimensions, columns=all_ugs, fill_value=0)
 
-            subplot_titles = (
-                "<b>(a)</b> Claude 4.5 Haiku",
-                "<b>(b)</b> Gemini 2.5 flash",
-                "<b>(c)</b> Llama 4 Scout",
-                "<b>(d)</b> GPT o4-mini",
+            fig_t9, dh = build_interaction_subplot(
+                [hm_claude, hm_gemini, hm_llama, hm_gpt], all_dimensions, all_ugs,
+                "Disclosure Rates by Demographics × User Group",
+                left_margin=450,
             )
-            FONT_STYLE = dict(
-                family="Times New Roman, serif", size=14, color="black"
-            )
-
-            fig_t9 = make_subplots(
-                rows=1,
-                cols=4,
-                horizontal_spacing=0.02,
-                subplot_titles=subplot_titles,
-                shared_yaxes=True,
-            )
-
-            heatmap_args = dict(
-                colorscale="Blues",
-                zmin=0,
-                zmax=100,
-                texttemplate="%{z:.1f}",
-                textfont={"size": 14, "color": "black"},
-            )
-
-            fig_t9.add_trace(
-                go.Heatmap(
-                    z=heatmap_claude.values,
-                    x=heatmap_claude.columns,
-                    y=heatmap_claude.index,
-                    showscale=False,
-                    **heatmap_args,
-                ),
-                row=1,
-                col=1,
-            )
-            fig_t9.add_trace(
-                go.Heatmap(
-                    z=heatmap_gemini.values,
-                    x=heatmap_gemini.columns,
-                    y=heatmap_gemini.index,
-                    showscale=False,
-                    **heatmap_args,
-                ),
-                row=1,
-                col=2,
-            )
-            fig_t9.add_trace(
-                go.Heatmap(
-                    z=heatmap_llama.values,
-                    x=heatmap_llama.columns,
-                    y=heatmap_llama.index,
-                    showscale=False,
-                    **heatmap_args,
-                ),
-                row=1,
-                col=3,
-            )
-            fig_t9.add_trace(
-                go.Heatmap(
-                    z=heatmap_gpt.values,
-                    x=heatmap_gpt.columns,
-                    y=heatmap_gpt.index,
-                    showscale=True,
-                    colorbar=dict(
-                        title="Rate (%)",
-                        thickness=15,
-                        len=0.9,
-                        x=1.02,
-                        ticksuffix="%",
-                    ),
-                    **heatmap_args,
-                ),
-                row=1,
-                col=4,
-            )
-
-            dynamic_height = max(550, len(all_dimensions) * 35 + 150)
-
-            fig_t9.update_layout(
-                template="simple_white",
-                width=2000,
-                height=dynamic_height,
-                margin=dict(l=450, r=80, t=100, b=150),
-                font=FONT_STYLE,
-                title_text="<b>Figure:</b> Disclosure Rates by Demographics and User Group",
-            )
-
-            fig_t9.update_yaxes(showticklabels=False, row=1, col=2)
-            fig_t9.update_yaxes(showticklabels=False, row=1, col=3)
-            fig_t9.update_yaxes(showticklabels=False, row=1, col=4)
-
-            fig_t9.update_xaxes(tickangle=45, tickfont=dict(size=12))
-            fig_t9.update_yaxes(tickfont=dict(size=13), title_standoff=30, row=1, col=1)
-
             html_inter3 = fig_t9.to_html(full_html=True, include_plotlyjs='cdn')
-            components.html(html_inter3, height=dynamic_height + 50, scrolling=True)
+            components.html(html_inter3, height=dh + 50, scrolling=True)
         else:
             st.warning("analyse.csv data not found.")
-
-
