@@ -17,6 +17,12 @@ can be used to conduct lightweight model evaluations specific to sensitive
 topics, enabling model developers and deployers to prioritize key areas of
 concern for in-depth human evaluation.
 
+<p align="center">
+  <img src="NodeSynth_flow.svg" alt="NodeSynth Flowchart" width="100%">
+  <br>
+  <em><b>Figure 1:</b> A visual representation of the NodeSynth approach. Based on user inputs, NodeSynth (Step 1) creates a complete, three layer taxonomy using a fine-tuned model; and (Step 2) extracts metadata (e.g., sensitive characteristics) from relevant sources, related to the branches of the taxonomy. Utilizing the aforementioned concepts and annotations, NodeSynth (Step 3) generates annotated synthetic queries for model evaluation.</em>
+</p>
+
 ## Getting Started
 
 TODO: Add installation and usage instructions.
