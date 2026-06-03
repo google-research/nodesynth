@@ -45,13 +45,12 @@ TODO: List requirements and dependencies.
 
 If you use NodeSynth in your research, please cite the following paper:
 
-```bibtex
-@article{nodesynth2026,
-  title={From Policy to Prompt: Socially Aligned Synthetic Data for AI Evaluation},
-  author={TODO: Add full author list},
+@article{rashid2026nodesynth,
+  title={NodeSynth: Socially Aligned Synthetic Data for AI Evaluation},
+  author={Rashid, Qazi Mamunur and Yang, Xuan and Yang, Zhengzhe and Pan, Yanzhou and van Liemt, Erin and Neal, Darlene and Pancholi, Kshitij and Smith-Loud, Jamila},
+  journal={arXiv preprint arXiv:2605.14381},
   year={2026}
 }
-```
 
 ## ⚠️ Disclaimer
 
