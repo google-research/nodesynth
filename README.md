@@ -33,25 +33,18 @@ You can explore the full workflow directly in our [**Live Prototype**](https://s
 
 This prototype and the approach outlined in the [accompanying paper](https://arxiv.org/abs/2605.14381) can be used to conduct lightweight model evaluations specific to sensitive topics, enabling model developers and deployers to prioritize key areas of concern for in-depth human evaluation.
 
-## ⚙️ Getting Started
-
-TODO: Add installation and usage instructions.
-
-## ⚙️ Requirements
-
-TODO: List requirements and dependencies.
-
 ## 📖 Citation
 
 If you use NodeSynth in your research, please cite the following paper:
 
+```bibtex
 @article{rashid2026nodesynth,
   title={NodeSynth: Socially Aligned Synthetic Data for AI Evaluation},
   author={Rashid, Qazi Mamunur and Yang, Xuan and Yang, Zhengzhe and Pan, Yanzhou and van Liemt, Erin and Neal, Darlene and Pancholi, Kshitij and Smith-Loud, Jamila},
   journal={arXiv preprint arXiv:2605.14381},
   year={2026}
 }
-
+```
 ## ⚠️ Disclaimer
 
 This is not an officially supported Google product. This project is not
